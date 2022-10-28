@@ -2,12 +2,16 @@
   "name": "greek-study",
   "version": "0.1.0",
   "private": true,
+  "main": "public/app/main.js",
   "dependencies": {
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
+    "bootstrap": "^5.2.1",
     "react": "^18.2.0",
+    "react-bootstrap": "^2.5.0",
     "react-dom": "^18.2.0",
+    "react-latex": "^2.0.0",
     "react-scripts": "5.0.1",
     "web-vitals": "^2.1.4"
   },
@@ -15,13 +19,17 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "electron-dev": "export ELECTRON_START_URL=http://localhost:3000 && export CONFIG=test-config.json && electron ."
   },
   "eslintConfig": {
     "extends": [
       "react-app",
       "react-app/jest"
     ]
+  },
+  "devDependencies": {
+    "electron": "^20.1.3"
   },
   "browserslist": {
     "production": [
