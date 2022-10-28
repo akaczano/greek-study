@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "main": "public/app/main.js",
+  "homepage": "http://akaczano.github.io/greek-study",
   "dependencies": {
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
@@ -20,6 +21,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
     "electron-dev": "export ELECTRON_START_URL=http://localhost:3000 && export CONFIG=test-config.json && electron ."
   },
   "eslintConfig": {
@@ -29,7 +32,8 @@
     ]
   },
   "devDependencies": {
-    "electron": "^20.1.3"
+    "electron": "^20.1.3",
+    "gh-pages": "^4.0.0"
   },
   "browserslist": {
     "production": [

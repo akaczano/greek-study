@@ -47,8 +47,7 @@ function ChapterList(props) {
                     <Button variant="danger" onClick={() => { props.onDelete(toDelete); setToDelete(null) }}>Confirm</Button>
                     <Button variant="secondary" onClick={() => setToDelete(null)}>Cancel</Button>
                 </Modal.Footer>
-            </Modal>
-            <h3>Chapter List</h3>
+            </Modal>            
             <ListGroup style={{ maxHeight: '75vh', overflowY: 'auto' }}>
                 {chapters.slice().sort(compareChapters).map(c => {
                     const {

@@ -25,7 +25,7 @@ function Verbs(props) {
                     </ButtonGroup>
                 </Modal.Footer>
             </Modal>
-            <h3>Verb Endings</h3>
+            
             <ListGroup>
                 {charts.sort((a, b) => a.description.localeCompare(b.description)).map(c => {
                     return (                        

@@ -47,8 +47,7 @@ function ChapterView(props) {
 
     return (
         <Container>
-            <TermInput onClose={() => setShowDialog(false)} add={doAdd} show={showDialog} term={term} setTerm={setTerm} />
-            <h3>{description}</h3>
+            <TermInput onClose={() => setShowDialog(false)} add={doAdd} show={showDialog} term={term} setTerm={setTerm} />            
             <ListGroup style={{ maxHeight: '75vh', overflowY: 'auto' }}>
                 {words.slice().sort(compareTerms).map(t => {
                     return (

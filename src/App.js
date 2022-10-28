@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Container, Button } from 'react-bootstrap'
+import { Container, Button, Row, Col } from 'react-bootstrap'
 
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -13,6 +13,7 @@ import ChartDisplay from './components/ChartDisplay';
 import NounQuiz from './components/NounQuiz';
 import Verbs from './components/Verbs'
 import VerbDisplay from './components/VerbDisplay'
+import Keyboard from './components/Keyboard'
 
 const LANDING = 0
 const CHAPTER_LIST = 1;
@@ -25,22 +26,23 @@ const NOUN_QUIZ = 7;
 const VERBS = 8;
 const VERB_DISPLAY = 9;
 const VERB_QUIZ = 10;
+const KEYBOARD = 11;
 
 function App() {
 
   const [location, setLocation] = useState(LANDING)
   const [chapterName, setChapterName] = useState(null)
   const [chartName, setChartName] = useState(null)
-  const [settings, setSettings] = useState({})  
-    
+  const [settings, setSettings] = useState({})
 
-  let data = null  
-  let readonly = false 
+
+  let data = null
+  let readonly = false
   if (window.electronAPI) {
     data = window.electronAPI.loadVocab()
   }
   else {
-    data = {chapters: [], declensions: [], verbs: []}
+    data = { chapters: [], declensions: [], verbs: [] }
     fetch("https://raw.githubusercontent.com/akaczano/greek-study/master/vocab.json")
       .then((resp) => resp.json())
       .then(({ chapters, declensions, verbs }) => {
@@ -50,19 +52,19 @@ function App() {
       })
     readonly = true
   }
-    
-  
+
+
 
   const { chapters, declensions, verbs } = data
-  
+
   const [vocab, setVocab] = useState(chapters)
   const [charts, setCharts] = useState(declensions)
   const [verbCharts, setVerbCharts] = useState(verbs)
 
   useEffect(() => {
     if (!readonly) {
-      window.electronAPI.saveVocab({ chapters: vocab, declensions: charts, verbs: verbCharts})
-    }    
+      window.electronAPI.saveVocab({ chapters: vocab, declensions: charts, verbs: verbCharts })
+    }
   }, [vocab, charts, verbCharts])
 
   const onEdit = chapterName => {
@@ -85,7 +87,7 @@ function App() {
         }]
       }
     ]
-    setVocab(newVocab)    
+    setVocab(newVocab)
   }
 
   const goBack = () => {
@@ -104,17 +106,17 @@ function App() {
       ...otherChapters,
       { ...chapter, words: chapter.words.filter(w => w.greek != greek) }
     ]
-    setVocab(newVocab)    
+    setVocab(newVocab)
   }
 
   const addChapter = chapterName => {
     const newVocab = [...vocab, { description: chapterName, attempts: 0, last_studied: null, words: [] }]
-    setVocab(newVocab)    
+    setVocab(newVocab)
   }
 
   const deleteChapter = chapterName => {
     const otherChapters = vocab.filter(c => c.description != chapterName)
-    setVocab(otherChapters)    
+    setVocab(otherChapters)
   }
 
   const studyComplete = chapterName => {
@@ -126,7 +128,7 @@ function App() {
       ...otherChapters,
       { ...chapter, attempts: chapter.attempts + 1, last_studied: new Date() }
     ]
-    setVocab(newVocab)    
+    setVocab(newVocab)
   }
 
 
@@ -148,7 +150,29 @@ function App() {
     setVerbCharts([...verbCharts.filter(c => c.description != chartName)])
   }
 
-
+  const getComponentTitle = () => {
+    if (location === CHAPTER_LIST) {
+      return "Chapters"
+    }
+    else if (location === CHAPTER_VIEW) {
+      return vocab.filter(v => v.description == chapterName)[0].description
+    }
+    else if (location === VOCAB_QUIZ) {
+      return "Quiz"
+    }
+    else if (location === NOUNS) {
+      return "Noun Declensions"
+    }
+    else if (location === VERBS) {
+      return "Verb endings"
+    }
+    else if (location === KEYBOARD) {
+      return "Keyboard"
+    }
+    else {
+      return ""
+    }
+  }
 
   const getComponent = () => {
     if (location === CHAPTER_LIST) {
@@ -162,51 +186,51 @@ function App() {
     }
     else if (location === NOUNS) {
       return (<Nouns
-                  charts={charts}
-                  onSelect={d => {setLocation(CHART_DISPLAY); setChartName(d)}}
-                  onAdd={updateChart}
-                  delete={deleteChart}
-                  onStudy={d => {setLocation(CHART_QUIZ); setChartName(d)}}
-                  onQuiz={s => { setLocation(NOUN_QUIZ); setSettings(s) }}
-                  readonly={readonly} />)
+        charts={charts}
+        onSelect={d => { setLocation(CHART_DISPLAY); setChartName(d) }}
+        onAdd={updateChart}
+        delete={deleteChart}
+        onStudy={d => { setLocation(CHART_QUIZ); setChartName(d) }}
+        onQuiz={s => { setLocation(NOUN_QUIZ); setSettings(s) }}
+        readonly={readonly} />)
     }
     else if (location == CHART_DISPLAY) {
       return (
-          <ChartDisplay
-            chart={charts.filter(c => c.description == chartName)[0]}
-            onUpdate={updateChart}
-            back={() => setLocation(NOUNS)}
-            study={false}
-            readonly={readonly} />
-        )
+        <ChartDisplay
+          chart={charts.filter(c => c.description == chartName)[0]}
+          onUpdate={updateChart}
+          back={() => setLocation(NOUNS)}
+          study={false}
+          readonly={readonly} />
+      )
     }
     else if (location == CHART_QUIZ) {
       return (
-          <ChartDisplay
-            chart={charts.filter(c => c.description == chartName)[0]} 
-            back={() => setLocation(NOUNS)}
-            study={true} />
+        <ChartDisplay
+          chart={charts.filter(c => c.description == chartName)[0]}
+          back={() => setLocation(NOUNS)}
+          study={true} />
       )
     }
     else if (location == NOUN_QUIZ) {
       return (
-          <NounQuiz
-              charts={charts}
-              vocab={vocab}
-              settings={settings}
-              back={() => setLocation(NOUNS)} 
-              readonly={readonly} />
+        <NounQuiz
+          charts={charts}
+          vocab={vocab}
+          settings={settings}
+          back={() => setLocation(NOUNS)}
+          readonly={readonly} />
       )
     }
     else if (location === VERBS) {
       return (
-        <Verbs 
+        <Verbs
           charts={verbCharts}
-          onSelect={d => {setLocation(VERB_DISPLAY); setChartName(d)}}
+          onSelect={d => { setLocation(VERB_DISPLAY); setChartName(d) }}
           onAdd={updateVerbChart}
           delete={deleteVerbChart}
-          onStudy={d => {setLocation(VERB_QUIZ); setChartName(d)}}    
-          readonly={readonly}      
+          onStudy={d => { setLocation(VERB_QUIZ); setChartName(d) }}
+          readonly={readonly}
         />
       )
     }
@@ -221,23 +245,35 @@ function App() {
     }
     else if (location === VERB_QUIZ) {
       return (
-          <VerbDisplay
-              chart={verbCharts.filter(c => c.description == chartName)[0]}
-              back={() => setLocation(VERBS)}              
-              study={true}/>
-          )
+        <VerbDisplay
+          chart={verbCharts.filter(c => c.description == chartName)[0]}
+          back={() => setLocation(VERBS)}
+          study={true} />
+      )
+    }
+    else if (location === KEYBOARD) {
+      return <Keyboard />
     }
   }
 
   if (location === LANDING) {
-    return (<Landing onVocab={() => setLocation(CHAPTER_LIST)} onNouns={() => setLocation(NOUNS)} onVerbs={() => setLocation(VERBS)}/>)
+    return (<Landing onVocab={() => setLocation(CHAPTER_LIST)} onNouns={() => setLocation(NOUNS)} onVerbs={() => setLocation(VERBS)} />)
   }
   else {
     return (
-      <div style={{width: '100%'}}>
-        <Button tabIndex={-1} style={{ float: 'right', display: 'block'}} variant="link" onClick={() => setLocation(LANDING)}>Home</Button> <br/>
+      <div style={{ width: '100%' }}>
         <Container>
-          {getComponent()}
+          <Row style={{marginTop: '8px'}}>
+            <Col md={8}>
+              <h3>{getComponentTitle()}</h3>
+            </Col>
+            <Col>
+              <Button tabIndex={-1} variant="link" onClick={() => setLocation(LANDING)}>Home</Button>
+              <Button tabIndex={-1}  variant="link" onClick={() => setLocation(KEYBOARD)}>Keyboard</Button></Col>
+          </Row>
+          <Row>
+            {getComponent()}
+          </Row>
         </Container>
       </div>
     )

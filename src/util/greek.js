@@ -169,3 +169,12 @@ export const compareGreek = (a, b) => {
         return aindex - bindex
     }
 }
+
+
+export const defaultCommands = ["'", "\"", "/", "`", "~", "_"]    
+
+export const defaultKeys = ['a', 'b', 'g', 'd', 'e', 'z', 'y', 'h', 'i', 'k', 'l', 'm', 'n',
+                            'x', 'o', 'p', 'r', 's', 'q', 't', 'u', 'f', 'c', 'v', 'w']
+
+export const lowerCaseLetters = Array.from({ length: 25 }, (x, i) => i + parseInt('0x03B1', 16)).map(s => String.fromCharCode(s))
+export const capitalLetters = Array.from({ length: 25 }, (x, i) => i + parseInt('0x0391', 16)).map(s => String.fromCharCode(s))

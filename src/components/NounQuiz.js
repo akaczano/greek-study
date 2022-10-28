@@ -93,7 +93,7 @@ function NounQuiz(props) {
 
 
         if (settings.mode == 0) {
-            return term?.greek
+            return <strong style={{fontFamily: 'Tahoma'}}>{term?.greek}</strong>
         }
         else if (settings.mode == 1) {
             return (<>

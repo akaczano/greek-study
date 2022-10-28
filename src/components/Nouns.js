@@ -58,8 +58,7 @@ function Nouns(props) {
                         <Button variant="secondary" onClick={() => setDeleting(null)}>Cancel</Button>
                     </ButtonGroup>
                 </Modal.Footer>
-            </Modal>
-            <h3>Noun Declensions</h3>
+            </Modal>            
             <ListGroup style={{ maxHeight: '35vh', overflowY: 'auto' }}>
                 {props.charts?.sort((a, b) => a.description.localeCompare(b.description)).map(c => {
                     return (
