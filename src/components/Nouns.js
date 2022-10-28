@@ -58,7 +58,7 @@ function Nouns(props) {
                         <Button variant="secondary" onClick={() => setDeleting(null)}>Cancel</Button>
                     </ButtonGroup>
                 </Modal.Footer>
-            </Modal>            
+            </Modal>
             <ListGroup style={{ maxHeight: '35vh', overflowY: 'auto' }}>
                 {props.charts?.sort((a, b) => a.description.localeCompare(b.description)).map(c => {
                     return (
@@ -66,7 +66,7 @@ function Nouns(props) {
                             <span style={{ fontSize: '16px' }}>{c.description}</span>
                             <ButtonGroup style={{ float: 'right' }}>
                                 <Button variant="primary" onClick={() => props.onSelect(c.description)}>
-                                    { props.readonly ? "View" : "Edit" }
+                                    {props.readonly ? "View" : "Edit"}
                                 </Button>
                                 <Button variant="primary" disabled={!c.chart} onClick={() => props.onStudy(c.description)}>Study</Button>
                                 <Button variant="danger" onClick={() => setDeleting(c.description)} disabled={props.readonly}>Delete</Button>
@@ -75,7 +75,7 @@ function Nouns(props) {
                     )
                 })}
             </ListGroup>
-            <Button style={{ marginTop: '15px' }} onClick={() => setDescription('')}>Add chart</Button>
+            <Button disabled={props.readonly} style={{ marginTop: '15px' }} onClick={() => setDescription('')}>Add chart</Button>
             <hr />
             <Card>
                 <Card.Header><strong>Practice</strong></Card.Header>
@@ -114,13 +114,13 @@ function Nouns(props) {
                                 </Form.Group> <br />
                             </Col>
                             <Col>
-                                <Form.Group>   
-                                    <Form.Label>Article Setting</Form.Label>                                                                     
+                                <Form.Group>
+                                    <Form.Label>Article Setting</Form.Label>
                                     <Form.Check
                                         type="switch"
                                         label="Include article"
-                                        onChange={e => setSettings({...settings, articles: e.target.checked})}
-                                        value={settings.articles}/>
+                                        onChange={e => setSettings({ ...settings, articles: e.target.checked })}
+                                        value={settings.articles} />
                                 </Form.Group>
                             </Col>
                         </Row>
