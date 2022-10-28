@@ -71,7 +71,7 @@ function ChartDisplay(props) {
             return (
                 <div>
                     Match nouns that end with<br /><br />
-                    <GreekInput value={pattern} onChange={v => { setPattern(v); setDirty(true) }} tabIndex={cases.length * 2}/> <br />
+                    <GreekInput disabled={props.readonly} value={pattern} onChange={v => { setPattern(v); setDirty(true) }} tabIndex={cases.length * 2}/> <br />
                     <ButtonGroup style={{ marginTop: '15px' }}>
                         <Button variant="primary" disabled={!dirty || !valid()} onClick={save} tabIndex={cases.length * 2 + 1}>
                             Save
@@ -101,8 +101,8 @@ function ChartDisplay(props) {
                         return (
                             <tr>
                                 <td>{c}</td>
-                                <td><GreekInput value={chart[i]} onChange={v => updateChart(i, v)} tabIndex={i} invalid={invalid.includes(i)} /></td>
-                                <td><GreekInput value={chart[pi]} onChange={v => updateChart(pi, v)} tabIndex={pi} invalid={invalid.includes(pi)} /></td>
+                                <td><GreekInput value={chart[i]} onChange={v => updateChart(i, v)} tabIndex={i} invalid={invalid.includes(i)} disabled={props.readonly}/></td>
+                                <td><GreekInput value={chart[pi]} onChange={v => updateChart(pi, v)} tabIndex={pi} invalid={invalid.includes(pi)} disabled={props.readonly}/></td>
                             </tr>
                         )
                     })}

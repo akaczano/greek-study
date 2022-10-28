@@ -32,16 +32,18 @@ function Verbs(props) {
                             <ListGroup.Item key={c.description}>
                                 <span style={{ fontSize: '16px' }}>{c.description}</span>
                                 <ButtonGroup style={{ float: 'right' }}>
-                                    <Button variant="primary" onClick={() => props.onSelect(c.description)}>Edit</Button>
+                                    <Button variant="primary" onClick={() => props.onSelect(c.description)}>
+                                        {props.readonly ? "View" : "Edit"}
+                                    </Button>
                                     <Button variant="primary" disabled={!c.chart} onClick={() => props.onStudy(c.description)}>Study</Button>
-                                    <Button variant="danger" onClick={() => {props.delete(c.description)}}>Delete</Button>
+                                    <Button variant="danger" onClick={() => {props.delete(c.description)}} disabled={props.readonly}>Delete</Button>
                                 </ButtonGroup>
                             </ListGroup.Item>                        
                     )
                 })}
             </ListGroup>
 
-            <Button style={{ marginTop: '15px' }} onClick={() => setDescription('')}>Add chart</Button>
+            <Button style={{ marginTop: '15px' }} onClick={() => setDescription('')} disabled={props.readonly}>Add chart</Button>
         </div>
     )
 }

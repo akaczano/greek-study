@@ -58,10 +58,10 @@ function ChapterView(props) {
                                     <TermDisplay term={t} />
                                 </Col>
                                 <Col md={4}>
-                                    <Button variant="danger" style={{ float: 'right' }} onClick={() => props.deleteTerm(description, t.greek)}>
+                                    <Button variant="danger" style={{ float: 'right' }} onClick={() => props.deleteTerm(description, t.greek)} disabled={props.readonly}>
                                         Delete
                                     </Button>
-                                    <Button variant="primary" style={{ marginRight: '10px', float: 'right' }} onClick={() => onEdit(t)}>
+                                    <Button variant="primary" style={{ marginRight: '10px', float: 'right' }} onClick={() => onEdit(t)} disabled={props.readonly}>
                                         Edit
                                     </Button>
                                 </Col>
@@ -71,7 +71,7 @@ function ChapterView(props) {
                 })}
             </ListGroup>
             <ButtonGroup style={{ marginTop: '15px' }}>
-                <Button variant="primary" onClick={onNew}>Add term</Button>
+                <Button variant="primary" onClick={onNew} disabled={props.readonly}>Add term</Button>
                 <Button variant="primary" onClick={() => props.goBack()}>Back to chapter list</Button>
             </ButtonGroup>
         </Container>

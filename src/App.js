@@ -31,16 +31,38 @@ function App() {
   const [location, setLocation] = useState(LANDING)
   const [chapterName, setChapterName] = useState(null)
   const [chartName, setChartName] = useState(null)
-  const [settings, setSettings] = useState({})
+  const [settings, setSettings] = useState({})  
+    
 
-  const { chapters, declensions, verbs } = window.electronAPI.loadVocab()
+  let data = null  
+  let readonly = false 
+  if (window.electronAPI) {
+    data = window.electronAPI.loadVocab()
+  }
+  else {
+    data = {chapters: [], declensions: [], verbs: []}
+    fetch("https://raw.githubusercontent.com/akaczano/greek-study/master/vocab.json")
+      .then((resp) => resp.json())
+      .then(({ chapters, declensions, verbs }) => {
+        setVocab(chapters)
+        setCharts(declensions)
+        setVerbCharts(verbs)
+      })
+    readonly = true
+  }
+    
+  
+
+  const { chapters, declensions, verbs } = data
   
   const [vocab, setVocab] = useState(chapters)
   const [charts, setCharts] = useState(declensions)
   const [verbCharts, setVerbCharts] = useState(verbs)
 
   useEffect(() => {
-    window.electronAPI.saveVocab({ chapters: vocab, declensions: charts, verbs: verbCharts})
+    if (!readonly) {
+      window.electronAPI.saveVocab({ chapters: vocab, declensions: charts, verbs: verbCharts})
+    }    
   }, [vocab, charts, verbCharts])
 
   const onEdit = chapterName => {
@@ -96,6 +118,7 @@ function App() {
   }
 
   const studyComplete = chapterName => {
+    if (readonly) return
     const chapter = vocab.filter(c => c.description == chapterName)[0]
     const otherChapters = vocab.filter(c => c.description != chapterName)
 
@@ -126,12 +149,13 @@ function App() {
   }
 
 
+
   const getComponent = () => {
     if (location === CHAPTER_LIST) {
-      return <ChapterList vocab={vocab} onEdit={onEdit} onStudy={onStudy} onAdd={addChapter} onDelete={deleteChapter} />
+      return <ChapterList vocab={vocab} onEdit={onEdit} onStudy={onStudy} onAdd={addChapter} onDelete={deleteChapter} readonly={readonly} />
     }
     else if (location === CHAPTER_VIEW) {
-      return <ChapterView chapter={vocab.filter(v => v.description == chapterName)[0]} addTerm={addTerm} goBack={goBack} deleteTerm={deleteTerm} />
+      return <ChapterView chapter={vocab.filter(v => v.description == chapterName)[0]} addTerm={addTerm} goBack={goBack} deleteTerm={deleteTerm} readonly={readonly} />
     }
     else if (location === VOCAB_QUIZ) {
       return <VocabQuiz chapter={vocab.filter(v => v.description == chapterName)[0]} goBack={goBack} onComplete={studyComplete} />
@@ -143,16 +167,36 @@ function App() {
                   onAdd={updateChart}
                   delete={deleteChart}
                   onStudy={d => {setLocation(CHART_QUIZ); setChartName(d)}}
-                  onQuiz={s => { setLocation(NOUN_QUIZ); setSettings(s) }}/>)
+                  onQuiz={s => { setLocation(NOUN_QUIZ); setSettings(s) }}
+                  readonly={readonly} />)
     }
     else if (location == CHART_DISPLAY) {
-      return <ChartDisplay chart={charts.filter(c => c.description == chartName)[0]} onUpdate={updateChart} back={() => setLocation(NOUNS)} study={false}/>
+      return (
+          <ChartDisplay
+            chart={charts.filter(c => c.description == chartName)[0]}
+            onUpdate={updateChart}
+            back={() => setLocation(NOUNS)}
+            study={false}
+            readonly={readonly} />
+        )
     }
     else if (location == CHART_QUIZ) {
-      return <ChartDisplay chart={charts.filter(c => c.description == chartName)[0]}  back={() => setLocation(NOUNS)} study={true}/>
+      return (
+          <ChartDisplay
+            chart={charts.filter(c => c.description == chartName)[0]} 
+            back={() => setLocation(NOUNS)}
+            study={true} />
+      )
     }
     else if (location == NOUN_QUIZ) {
-      return <NounQuiz charts={charts} vocab={vocab} settings={settings} back={() => setLocation(NOUNS)}/>
+      return (
+          <NounQuiz
+              charts={charts}
+              vocab={vocab}
+              settings={settings}
+              back={() => setLocation(NOUNS)} 
+              readonly={readonly} />
+      )
     }
     else if (location === VERBS) {
       return (
@@ -161,7 +205,8 @@ function App() {
           onSelect={d => {setLocation(VERB_DISPLAY); setChartName(d)}}
           onAdd={updateVerbChart}
           delete={deleteVerbChart}
-          onStudy={d => {setLocation(VERB_QUIZ); setChartName(d)}}          
+          onStudy={d => {setLocation(VERB_QUIZ); setChartName(d)}}    
+          readonly={readonly}      
         />
       )
     }
@@ -171,15 +216,21 @@ function App() {
           chart={verbCharts.filter(c => c.description == chartName)[0]}
           back={() => setLocation(VERBS)}
           study={false}
-          onUpdate={updateVerbChart}/>)
+          onUpdate={updateVerbChart}
+          readonly={readonly} />)
     }
     else if (location === VERB_QUIZ) {
-      return <VerbDisplay chart={verbCharts.filter(c => c.description == chartName)[0]} back={() => setLocation(VERBS)} study={true}/>
+      return (
+          <VerbDisplay
+              chart={verbCharts.filter(c => c.description == chartName)[0]}
+              back={() => setLocation(VERBS)}              
+              study={true}/>
+          )
     }
   }
 
   if (location === LANDING) {
-    return <Landing onVocab={() => setLocation(CHAPTER_LIST)} onNouns={() => setLocation(NOUNS)} onVerbs={() => setLocation(VERBS)}/>
+    return (<Landing onVocab={() => setLocation(CHAPTER_LIST)} onNouns={() => setLocation(NOUNS)} onVerbs={() => setLocation(VERBS)}/>)
   }
   else {
     return (

@@ -44,12 +44,12 @@ function ChapterList(props) {
                     Are you sure you want to delete <strong>{toDelete}</strong>?
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="danger" onClick={ () => { props.onDelete(toDelete); setToDelete(null) }}>Confirm</Button>
+                    <Button variant="danger" onClick={() => { props.onDelete(toDelete); setToDelete(null) }}>Confirm</Button>
                     <Button variant="secondary" onClick={() => setToDelete(null)}>Cancel</Button>
                 </Modal.Footer>
             </Modal>
             <h3>Chapter List</h3>
-            <ListGroup>
+            <ListGroup style={{ maxHeight: '75vh', overflowY: 'auto' }}>
                 {chapters.slice().sort(compareChapters).map(c => {
                     const {
                         attempts,
@@ -72,10 +72,10 @@ function ChapterList(props) {
                                 <Col md={4}>
                                     <ButtonGroup style={{ float: 'right' }}>
                                         <Button variant="primary" onClick={() => props.onEdit(description)}>
-                                            Edit
+                                            { props.readonly ? "View" : "Edit"}
                                         </Button>
                                         <Button variant="primary" onClick={() => props.onStudy(description)} disabled={words.length < 1}>Study</Button>
-                                        <Button variant="danger" onClick={() => setToDelete(description) }>Delete</Button>
+                                        <Button variant="danger" disabled={props.readonly} onClick={() => setToDelete(description)}>Delete</Button>
                                     </ButtonGroup>
                                 </Col>
                             </Row>
@@ -85,7 +85,9 @@ function ChapterList(props) {
 
             </ListGroup>
 
-            <Button variant="primary" style={{ marginTop: '15px' }} onClick={addNew}>New Chapter</Button>
+            <Button variant="primary" style={{ marginTop: '15px' }} onClick={addNew} disabled={props.readonly}>
+                New Chapter
+            </Button>
         </Container>
     )
 }

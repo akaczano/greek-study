@@ -84,6 +84,7 @@ function VerbDisplay(props) {
                                 label="Endings"
                                 checked={!irregular}
                                 tabIndex={7}
+                                disabled={props.readonly}
                                 onChange={e => {setIrregular(!e.target.checked); setDirty(true)}} />
                         </Col>
                         <Col>
@@ -92,6 +93,7 @@ function VerbDisplay(props) {
                                 label="Irregular Verb"
                                 checked={irregular}
                                 tabIndex={8}
+                                disabled={props.readonly}
                                 onChange={e => {setIrregular(e.target.checked); setDirty(true)}} />
                         </Col>
                     </Row>
@@ -102,19 +104,24 @@ function VerbDisplay(props) {
                                 <Form.Control
                                     type="number"
                                     value={pp}
-                                    disabled={irregular}
-                                    tabIndex={9}
+                                    disabled={irregular || props.readonly}
+                                    tabIndex={9}                                    
                                     onChange={e => {setPP(e.target.value); setDirty(true)}}/>
                             </Form.Group>
                         </Col>
                         <Col>
                             <Form.Group>
                                 <Form.Label>Augment</Form.Label>
-                                <GreekInput value={augment} disabled={irregular} onChange={t => {setAugment(t); setDirty(true)}} tabIndex={10}/>
+                                <GreekInput value={augment} disabled={irregular || props.readonly} onChange={t => {setAugment(t); setDirty(true)}} tabIndex={10}/>
                             </Form.Group>
                         </Col>
                         <Col>
-                            <Form.Check label="medial sigma" style={{marginTop: '30px'}} disabled={irregular} tabIndex={11} onChange={e => setMS(e.target.checked)}/>
+                            <Form.Check
+                                label="medial sigma"
+                                style={{marginTop: '30px'}}
+                                disabled={irregular || props.readonly}
+                                tabIndex={11}
+                                onChange={e => setMS(e.target.checked)} />
                         </Col>
                     </Row>
 
@@ -147,8 +154,8 @@ function VerbDisplay(props) {
                         return (
                             <tr>
                                 <td>{c}</td>
-                                <td><GreekInput value={chart[i]} onChange={v => updateChart(i, v)} tabIndex={i} invalid={invalid.includes(i)} /></td>
-                                <td><GreekInput value={chart[pi]} onChange={v => updateChart(pi, v)} tabIndex={pi} invalid={invalid.includes(pi)} /></td>
+                                <td><GreekInput value={chart[i]} onChange={v => updateChart(i, v)} tabIndex={i} invalid={invalid.includes(i)} disabled={props.readonly} /></td>
+                                <td><GreekInput value={chart[pi]} onChange={v => updateChart(pi, v)} tabIndex={pi} invalid={invalid.includes(pi)} disabled={props.readonly} /></td>
                             </tr>
                         )
                     })}
