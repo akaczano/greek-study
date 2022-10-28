@@ -56,21 +56,22 @@ function NounQuiz(props) {
 
             if (settings.articles) {
                 let articleChart = null;
-                if (word.greek.endsWith('\\omicron')) {
-                    articleChart = charts.filter(c => c.pattern.endsWith('\\Mu'))[0]
+                if (word.greek.endsWith('ὁ')) {
+                    articleChart = charts.filter(c => c.pattern == 'Μ')[0]
                 }
-                else if (word.greek.endsWith('\\eta')) {
-                    articleChart = charts.filter(c => c.pattern.endsWith('\\Phi'))[0]
+                else if (word.greek.endsWith('ἡ')) {
+                    articleChart = charts.filter(c => c.pattern == 'Φ')[0]
                 }
                 else {
-                    articleChart = charts.filter(c => c.pattern.endsWith('\\Nu'))
+                    articleChart = charts.filter(c => c.pattern == 'Ν')[0]
                 }
                 if (articleChart) {
-                    greek = articleChart.chart[caseIndex] + '\\space' + greek                    
+                    console.log(articleChart)
+                    greek = articleChart.chart[caseIndex] + ' ' + greek                    
                 }
             }
 
-            const english = settings.articles ? 'the ' + word.english : word.english
+            const english = settings.articles ? ([4, 9].includes(caseIndex) ? 'Oh ' : 'the ') + word.english : word.english
 
             return {
                 greek, caseIndex, english: english
@@ -116,7 +117,7 @@ function NounQuiz(props) {
         }
         let correct = false
         if (settings.mode == 0) {
-            correct = textInput == term.english && (caseInput + (5 * numberInput)) == term.caseIndex
+            correct = textInput.toUpperCase(0) == term.english.toUpperCase() && (caseInput + (5 * numberInput)) == term.caseIndex
         }
         else if (settings.mode == 1) {            
             correct = removeAccents(textInput) == removeAccents(term.greek)

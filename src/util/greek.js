@@ -66,12 +66,13 @@ const lists = [
 
 export const isVowel = c => {
     for (const [list] of lists) {
-        if (list.includes(c)) return true
+        if (list.includes(c.toLowerCase())) return true
     }
     return false
 }  
 
-export const mapVowel = (c, update) => {        
+export const mapVowel = (v, update) => {        
+        const c = v.toLowerCase()
         let index = 0
         let state = {}
         for (const [list, bm, accent, subscript] of lists) {
@@ -100,9 +101,11 @@ export const mapVowel = (c, update) => {
             }
         }
         if (target) {
+            if (c != v) target = target.toUpperCase()
             return target
         }
-        return c
+        
+        return v
     }
 
 

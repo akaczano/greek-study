@@ -19,9 +19,7 @@ function GreekInput(props) {
 
     const keys = localStorage.getItem("greek_keys")?.split(',') || defaultKeys
     const specialKeys = localStorage.getItem("greek_commands")?.split(',') || defaultCommands
-
     
-
 
     const map = {}
 
