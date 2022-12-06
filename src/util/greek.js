@@ -135,7 +135,9 @@ export const compareTypes = (a, b) => {
     return 0;
 }
 
-export const compareGreek = (a, b) => {    
+export const compareGreek = (a, b) => a.localeCompare(b)
+
+export const compareGreekf = (a, b) => {    
     let apure = removeAccents(a).substring(1)
     let bpure = removeAccents(b).substring(1)
 

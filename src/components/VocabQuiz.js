@@ -99,7 +99,7 @@ function VocabQuiz(props) {
             return <span>{words[position].english}</span>
         }
         else {
-            return <Latex>{`$${words[position].greek}$`}</Latex>
+            return <strong style={{ fontFamily: "tahoma"}}>{words[position].greek}</strong>
         }
     }
 
