@@ -1,22 +1,44 @@
 import { useState } from 'react'
-import { Table, Button, ButtonGroup, Badge } from 'react-bootstrap'
+
+import { useDispatch, useSelector } from 'react-redux'
+import {
+    Container,
+    TextField,
+    Button,
+    ButtonGroup,
+    Chip,
+    Typography,
+    Table,
+    TableHead,
+    TableBody,
+    TableRow,
+    TableCell,
+    Paper,
+    TableContainer
+} from '@mui/material'
 
 import { removeAccents } from '../util/greek'
-import GreekInput from './GreekInput'
+import { updateChart } from '../state/contentSlice'
+import { go, NOUNS } from '../state/navSlice'
+import { updateText } from '../util/input'
 
 const cases = [
     'Nominative', 'Genitive', 'Dative', 'Accusative', 'Vocative'
 ]
 
 function ChartDisplay(props) {
+    const dispatch = useDispatch()
+    const { chartName } = useSelector(state => state.nav.params)
+    const initialChart = useSelector(state => state.content.content.declensions.filter(c => c.description == chartName)[0])
+    const readOnly = useSelector(state => state.content.readOnly)
 
-    const [pattern, setPattern] = useState(props.chart.pattern || '')
-    const [chart, setChart] = useState((props.study || !props.chart.chart) ? ['', '', '', '', '', '', '', '', '', ''] : props.chart.chart)
+    const [pattern, setPattern] = useState(initialChart.pattern || '')
+    const [chart, setChart] = useState((props.study || !initialChart.chart) ? ['', '', '', '', '', '', '', '', '', ''] : initialChart.chart)
     const [dirty, setDirty] = useState(false)
     const [invalid, setInvalid] = useState([])
     const [correct, setCorrect] = useState(false)
 
-    const updateChart = (i, v) => {
+    const modifyChart = (i, v) => {
         const chartCopy = chart.slice()
         chartCopy[i] = v
         setChart(chartCopy)
@@ -24,7 +46,7 @@ function ChartDisplay(props) {
     }
 
     const save = () => {
-        props.onUpdate({ ...props.chart, pattern, chart })
+        dispatch(updateChart({ ...initialChart, pattern, chart }))
         setDirty(false)
     }
 
@@ -33,7 +55,7 @@ function ChartDisplay(props) {
     const check = () => {
         const l = []
         for (let i = 0; i < chart.length; i++) {
-            if (removeAccents(chart[i]) != removeAccents(props.chart.chart[i])) {
+            if (removeAccents(chart[i]) != removeAccents(initialChart.chart[i])) {
                 l.push(i)
             }
         }
@@ -54,15 +76,15 @@ function ChartDisplay(props) {
                 <div>
                     {correct ? (
                         <>
-                            <Badge bg="success">Study Complete</Badge> 
-                            <Button variant="link" onClick={reset}>Try again</Button> <br />
+                            <Chip color="success" label="Study complete" />
+                            <Button color="secondary" onClick={reset}>Try again</Button> <br />
                             <hr />
                         </>
                     ) : null}
 
                     <ButtonGroup>
-                        <Button variant="primary" disabled={!valid() || correct} onClick={check} tabIndex={cases.length * 2}>Check</Button>
-                        <Button variant="primary" onClick={props.back} tabIndex={cases.length * 2 + 1}>Back to chart list</Button>
+                        <Button variant="outlined" disabled={!valid() || correct} onClick={check} tabIndex={cases.length * 2}>Check</Button>
+                        <Button variant="outlined" onClick={() => dispatch(go([NOUNS, {}]))} tabIndex={cases.length * 2 + 1}>Back to chart list</Button>
                     </ButtonGroup>
                 </div>
             )
@@ -70,13 +92,20 @@ function ChartDisplay(props) {
         else {
             return (
                 <div>
-                    Match nouns that end with<br /><br />
-                    <GreekInput disabled={props.readonly} value={pattern} onChange={v => { setPattern(v); setDirty(true) }} tabIndex={cases.length * 2}/> <br />
+                    <TextField
+                        label="Match nouns ending with"
+                        disabled={readOnly}
+                        value={pattern}
+                        onChange={e => { setPattern(updateText(e)); setDirty(true) }}
+                        tabIndex={cases.length * 2}
+                        size="small"
+                        inputProps={{ style: { fontFamily: "tahoma", fontSize: "19px" } }} />
+                    <br />
                     <ButtonGroup style={{ marginTop: '15px' }}>
-                        <Button variant="primary" disabled={!dirty || !valid()} onClick={save} tabIndex={cases.length * 2 + 1}>
+                        <Button variant="outlined" disabled={!dirty || !valid()} onClick={save} tabIndex={cases.length * 2 + 1}>
                             Save
                         </Button>
-                        <Button variant="primary" onClick={props.back} tabIndex={-1}>Back to chart list</Button>
+                        <Button variant="outlined" onClick={() => dispatch(go([NOUNS, {}]))} tabIndex={-1}>Back to chart list</Button>
                     </ButtonGroup>
                 </div>
             )
@@ -84,33 +113,50 @@ function ChartDisplay(props) {
     }
 
     return (
-        <div>
-            <h4>{props.chart.description}</h4>
-            <hr />
-            <Table size="sm">
-                <thead>
-                    <tr>
-                        <th></th>
-                        <th>Singular</th>
-                        <th>Plural</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {cases.map((c, i) => {
-                        const pi = i + cases.length
-                        return (
-                            <tr>
-                                <td>{c}</td>
-                                <td><GreekInput value={chart[i]} onChange={v => updateChart(i, v)} tabIndex={i} invalid={invalid.includes(i)} disabled={props.readonly}/></td>
-                                <td><GreekInput value={chart[pi]} onChange={v => updateChart(pi, v)} tabIndex={pi} invalid={invalid.includes(pi)} disabled={props.readonly}/></td>
-                            </tr>
-                        )
-                    })}
-                </tbody>
-            </Table>
+        <Container>
+            <Typography variant="h5" component="h5">{initialChart.description}</Typography>            
+            <TableContainer component={Paper} sx={{ marginTop: '10px', marginBottom: '25px'}}>
+                <Table size="small">
+                    <TableHead>
+                        <TableRow>
+                            <TableCell></TableCell>
+                            <TableCell>Singular</TableCell>
+                            <TableCell>Plural</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {cases.map((c, i) => {
+                            const pi = i + cases.length
+                            return (
+                                <TableRow>
+                                    <TableCell>{c}</TableCell>
+                                    <TableCell>
+                                        <TextField
+                                            size="small"
+                                            inputProps={{ style: { fontFamily: "tahoma", fontSize: "19px" }, tabIndex: i }}
+                                            value={chart[i]}
+                                            onChange={e => modifyChart(i, updateText(e))}
+                                            error={invalid.includes(i)}
+                                            disabled={readOnly} />
+                                    </TableCell>
+                                    <TableCell>
+                                        <TextField
+                                            size="small"
+                                            inputProps={{ style: { fontFamily: "tahoma", fontSize: "19px" }, tabIndex: pi }}
+                                            value={chart[pi]}
+                                            onChange={e => modifyChart(pi, updateText(e))}
+                                            error={invalid.includes(pi)}
+                                            disabled={readOnly} />
+                                    </TableCell>
+                                </TableRow>
+                            )
+                        })}
+                    </TableBody>
+                </Table>
+            </TableContainer>
             {getBottom()}
 
-        </div>
+        </Container>
     )
 
 }

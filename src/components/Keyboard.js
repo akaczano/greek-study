@@ -1,8 +1,22 @@
 import { useState } from 'react'
-import { Table, Form, Button, Row, Col, Container, ButtonGroup } from 'react-bootstrap'
+
+import {
+    Button,
+    Container,
+    Tab,
+    Box,
+    Tabs,
+    TableContainer,
+    Table,
+    TableBody,
+    TableHead,
+    TableRow,
+    TableCell,
+    TextField,
+    Paper
+} from '@mui/material'
 
 import { defaultKeys, defaultCommands, lowerCaseLetters } from '../util/greek'
-import GreekInput from './GreekInput'
 
 function Keyboard() {
 
@@ -39,18 +53,22 @@ function Keyboard() {
     const getRow = (i) => {
         if (tabIndex == 0) {
             return (
-                <Row key={i} style={{ margin: '5px' }}>
-                    <Col><GreekInput disabled={true} value={lowerCaseLetters[i]} /></Col>
-                    <Col><Form.Control type="text" value={keys[i]} onChange={e => updateKeys(i, e.target.value)} /></Col>
-                </Row>
+                <TableRow key={i} style={{ margin: '5px' }}>
+                    <TableCell>
+                        <TextField size="small" disabled={true} value={lowerCaseLetters[i]} inputProps={{ style: { fontFamily: "tahoma" } }} />
+                    </TableCell>
+                    <TableCell>
+                        <TextField size="small" value={keys[i]} onChange={e => updateKeys(i, e.target.value)} />
+                    </TableCell>
+                </TableRow>
             )
         }
         else {
             return (
-                <Row key={i} style={{ margin: '5px' }}>
-                    <Col>{labels[i]}</Col>
-                    <Col><Form.Control type="text" value={commands[i]} onChange={e => updateKeys(i, e.target.value)} /></Col>
-                </Row>
+                <TableRow key={i} style={{ margin: '5px' }}>
+                    <TableCell>{labels[i]}</TableCell>
+                    <TableCell><TextField size="small" value={commands[i]} onChange={e => updateKeys(i, e.target.value)} /></TableCell>
+                </TableRow>
             )
         }
     }
@@ -70,28 +88,32 @@ function Keyboard() {
     }
 
     return (
-        <div>
+        <Container>
 
-            { getInstructions()}
-            <Row>
-                <ButtonGroup>
-                    <Button variant="secondary" disabled={tabIndex == 0} onClick={() => setTabIndex(0)}>Letters</Button>
-                    <Button variant="secondary" disabled={tabIndex != 0} onClick={() => setTabIndex(1)}>Symbols</Button>
-                </ButtonGroup>
-            </Row>
-            <Container >
-                <Row>
-                    <Col style={{ textAlign: 'center' }}>{tabIndex == 0 ? "Greek letter" : "Symbol"}</Col>
-                    <Col style={{ textAlign: 'center' }}>Bound key</Col>
-                </Row>
-                <div style={{ maxHeight: '65vh', overflowY: 'auto' }}>
-                    {tabIndex == 0 ? keys.map((_, i) => getRow(i)) : commands.map((_, i) => getRow(i))}
-                </div>
-            </Container>
+            {getInstructions()}
+            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                <Tabs value={tabIndex} onChange={(_, i) => setTabIndex(i)} aria-label="basic tabs example">
+                    <Tab label="Letters" />
+                    <Tab label="Symbols" />
+                </Tabs>
+            </Box>
+            <TableContainer component={Paper} sx={{maxHeight: "60vh", marginBottom: '15px'}}>
+                <Table size="small" stickyHeader>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>{tabIndex == 0 ? "Greek letter" : "Symbol"}</TableCell>
+                            <TableCell>Bound Key</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {tabIndex == 0 ? keys.map((_, i) => getRow(i)) : commands.map((_, i) => getRow(i))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
 
-            <br />
-            <Button variant="primary" disabled={!dirty || invalid()} onClick={save}>Save</Button>
-        </div>
+
+            <Button variant="outlined" disabled={!dirty || invalid()} onClick={save}>Save</Button>
+        </Container>
     )
 
 }

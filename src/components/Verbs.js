@@ -1,50 +1,77 @@
 import { useState } from 'react'
-import { ListGroup, Button, ButtonGroup, Modal, Form, Row, Col } from 'react-bootstrap'
+import { useDispatch, useSelector } from 'react-redux'
+import { 
+    IconButton, 
+    List,
+    ListItem,
+    ListItemButton,
+    ListItemText,
+    ListItemIcon,
+    Button,
+    Typography,
+    Container,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    TextField
+} from '@mui/material'
+import DeleteIcon from '@mui/icons-material/Delete';
+import TableViewIcon from '@mui/icons-material/TableView';
 
-function Verbs(props) {
+import { updateVerbChart, deleteVerbChart } from '../state/contentSlice'
+import { go, VERB_DISPLAY, VERB_QUIZ } from '../state/navSlice'
 
-    const { charts } = props
-    const [description, setDescription] = useState(null)    
+function Verbs() {
+    const dispatch = useDispatch()
+    const charts = useSelector(state => state.content.content.verbs.slice())
+    const readOnly = useSelector(state => state.content.readOnly)
+
+    const [description, setDescription] = useState(null)
 
     return (
-        <div>
-            <Modal show={description != null} onHide={() => setDescription(null)}>
-                <Modal.Header>
-                    <Modal.Title>Add verb chart</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <Form.Group>
-                        <Form.Label>Description</Form.Label>
-                        <Form.Control type="text" value={description} onChange={e => setDescription(e.target.value)}/>
-                    </Form.Group>
-                </Modal.Body>
-                <Modal.Footer>
-                    <ButtonGroup>
-                        <Button variant="primary" onClick={() => {props.onAdd({description, chart: null}); setDescription(null)}}>Add</Button>
-                        <Button variant="primary" onClick={() => setDescription(null)}>Cancel</Button>
-                    </ButtonGroup>
-                </Modal.Footer>
-            </Modal>
-            
-            <ListGroup>
+        <Container>
+            <Dialog open={description != null} onClose={() => setDescription(null)} fullWidth>                
+                <DialogTitle>Add verb chart</DialogTitle>                
+                <DialogContent>                                            
+                        <TextField
+                            label="Description"
+                            sx={{ marginTop: '10px'}}
+                            fullWidth
+                            value={description}
+                            onChange={e => setDescription(e.target.value)} />
+                    
+                </DialogContent>
+                <DialogActions>                    
+                        <Button variant="outlined" onClick={() => { dispatch(updateVerbChart({ description, chart: null })); setDescription(null) }}>Add</Button>
+                        <Button variant="outlined" onClick={() => setDescription(null)}>Cancel</Button>                    
+                </DialogActions>
+            </Dialog>
+
+            <Typography variant="h5" component="h5">Verb Forms</Typography>
+            <List style={{maxHeight: "70vh", overflowY: "auto", marginTop: "5px", border: '1px solid #b7cbeb', borderRadius: '2px' }}>
                 {charts.sort((a, b) => a.description.localeCompare(b.description)).map(c => {
-                    return (                        
-                            <ListGroup.Item key={c.description}>
-                                <span style={{ fontSize: '16px' }}>{c.description}</span>
-                                <ButtonGroup style={{ float: 'right' }}>
-                                    <Button variant="primary" onClick={() => props.onSelect(c.description)}>
-                                        {props.readonly ? "View" : "Edit"}
-                                    </Button>
-                                    <Button variant="primary" disabled={!c.chart} onClick={() => props.onStudy(c.description)}>Study</Button>
-                                    <Button variant="danger" onClick={() => {props.delete(c.description)}} disabled={props.readonly}>Delete</Button>
-                                </ButtonGroup>
-                            </ListGroup.Item>                        
+                    return (
+                        <ListItem key={c.description}>
+                            <ListItemButton onClick={() => dispatch(go([VERB_DISPLAY, { chartName: c.description }]))}>
+                                <ListItemIcon><TableViewIcon /></ListItemIcon>
+                                <ListItemText primary={c.description} />
+                            </ListItemButton>
+                            <Button variant="outlined" disabled={!c.chart} onClick={() => dispatch(go([VERB_QUIZ, { chartName: c.description }]))}>
+                                Practice
+                            </Button>
+                            <IconButton onClick={() => { dispatch(deleteVerbChart(c.description)) }} disabled={readOnly}>
+                                <DeleteIcon />
+                            </IconButton>                            
+                        </ListItem>
                     )
                 })}
-            </ListGroup>
+            </List>
 
-            <Button style={{ marginTop: '15px' }} onClick={() => setDescription('')} disabled={props.readonly}>Add chart</Button>
-        </div>
+            <Button style={{ marginTop: '15px' }} onClick={() => setDescription('')} disabled={readOnly} variant="outlined">
+                Add chart
+            </Button>
+        </Container>
     )
 }
 

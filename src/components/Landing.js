@@ -1,61 +1,78 @@
-import { Container, Row, Col, Card, Button } from 'react-bootstrap'
+
+import Button from '@mui/material/Button';
+import Grid from '@mui/material/Unstable_Grid2/Grid2';
+import { Container, Card, Typography, CardContent, CardActions } from '@mui/material';
+import { useDispatch } from 'react-redux'
 
 
-function Landing(props) {
-    return (<>
-        <Row style={{ padding: '10px', background: 'linear-gradient(#28805c, #2edb96)' }}>
-            <h1 style={{ color: 'white' }}>Welcome to Greek Study!</h1>
-        </Row>
-        <Row style={{ height: '6px', background: 'linear-gradient(to right, #11a899, #16f7e0)' }}></Row>        
+import NavBar from './NavBar';
+import { CHAPTER_LIST, NOUNS, VERBS, go } from '../state/navSlice'
+
+
+function Landing() {
+    const dispatch = useDispatch()
+
+    return (<>        
         <Container>
-            <Row style={{ marginTop: '10px' }}>
-                <p>
-                    Greek Study is your one stop shop for learning vocab, memorizing
-                    verb forms, and practicing noun declension.
-                </p>
-            </Row>
-            <Row>
-                <Col md={4}>
-                    <Card>
-                        <Card.Body>
-                            <Card.Title>
+            <Grid container spacing={1.5} style={{ marginTop: '10px' }}>
+                <Grid style={{ marginTop: '10px' }} md={12}>
+                    <p>
+                        θεωρία is your one stop shop for learning vocab, memorizing
+                        verb forms, and practicing noun declension.
+                    </p>
+                </Grid>
+                <Grid md={4} xs={12}>
+                    <Card sx={{ minWidth: 275 }}>
+                        <CardContent>
+                            <Typography variant="h6" color="text.primary" gutterBottom>
                                 Vocabulary
-                            </Card.Title>
-                            <Card.Text>
-                                Manage vocab lists and practice translating words.
-                            </Card.Text>
-                            <Button variant="primary" onClick={props.onVocab}>Get started</Button>
-                        </Card.Body>
+                            </Typography>
+                            <Typography sx={{ fontSize: "15px", minHeight: '75px' }} color="text.secondary" >
+                                Manage vocab lists and practice translating words from English to
+                                Greek and Greek to English.
+                            </Typography>
+                        </CardContent>
+                        <CardActions>
+                            <Button size="small" onClick={() => dispatch(go([CHAPTER_LIST, {}]))}>Get started</Button>
+                            <Button size="small">Learn more</Button>
+                        </CardActions>
                     </Card>
-                </Col >
-                <Col md={4}>
-                    <Card>
-                        <Card.Body>
-                            <Card.Title>
+                </Grid >
+                <Grid md={4} xs={12}>
+                    <Card sx={{ minWidth: 275 }}>
+                        <CardContent>
+                            <Typography variant="h6" color="text.primary" gutterBottom>
                                 Nouns
-                            </Card.Title>
-                            <Card.Text>
-                                Practice declensions
-                            </Card.Text>
-                            <Button variant="primary" onClick={props.onNouns}>Get started</Button>
-                        </Card.Body>
+                            </Typography>
+                            <Typography sx={{ fontSize: "15px", minHeight: '75px' }} color="text.secondary" >
+                                Manage and review endings for different groups of nouns, articles, and
+                                pronouns. Practice declining random nouns.
+                            </Typography>
+                        </CardContent>
+                        <CardActions>
+                            <Button size="small" onClick={() => dispatch(go([NOUNS, {}]))}>Get started</Button>
+                            <Button size="small">Learn more</Button>
+                        </CardActions>
                     </Card>
-                </Col>
-                <Col md={4}>
-                    <Card>
-                        <Card.Body>
-                            <Card.Title>
+                </Grid >
+                <Grid md={4} xs={12}>
+                    <Card sx={{ minWidth: 275 }}>
+                        <CardContent>
+                            <Typography variant="h6" color="text.primary" gutterBottom>
                                 Verbs
-                            </Card.Title>
-                            <Card.Text>
-                                Practice conjugation and translation with various verbs in a
-                                bunch of different tenses.
-                            </Card.Text>
-                            <Button variant="primary" onClick={props.onVerbs}>Get started</Button>
-                        </Card.Body>
+                            </Typography>
+                            <Typography sx={{ fontSize: "15px", minHeight: '75px' }} color="text.secondary" >
+                                Manage, view, and practice verb forms for different tenses, voices, and
+                                irregular verbs. Practice conjugation.
+                            </Typography>
+                        </CardContent>
+                        <CardActions>
+                            <Button size="small" onClick={() => dispatch(go([VERBS, {}]))}>Get started</Button>
+                            <Button size="small">Learn more</Button>
+                        </CardActions>
                     </Card>
-                </Col>
-            </Row>
+                </Grid >
+            </Grid>
         </Container>
     </>
     )

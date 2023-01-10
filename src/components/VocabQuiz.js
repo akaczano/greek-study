@@ -1,17 +1,43 @@
-import { useState, useEffect } from 'react'
-import { Container, Card, Button, Badge, ButtonGroup, Form, Row, Col } from 'react-bootstrap'
+import { useState } from 'react'
+import {
+    Card,
+    CardContent,
+    CardActions,
+    Typography,
+    Button,
+    TextField,
+    MenuItem,
+    FormControl,
+    FormLabel,
+    FormControlLabel,
+    Radio,
+    RadioGroup,
+    Checkbox,
+    Switch,
+    Stack,
+    Table,
+    TableBody,
+    TableRow,
+    TableCell,
+    Container,
+    Grid
+} from '@mui/material'
 import Latex from 'react-latex'
+import { useDispatch, useSelector } from 'react-redux'
 
-import GreekInput from './GreekInput'
 import { removeAccents } from '../util/greek'
-
+import { go, CHAPTER_LIST } from '../state/navSlice'
+import { updateText } from '../util/input'
+import { Box } from '@mui/system'
 
 const parts = ['verb', 'noun', 'adjective', 'other']
 
-function VocabQuiz(props) {
+function VocabQuiz() {
+    const dispatch = useDispatch()
+    const description = useSelector(state => state.nav.params.chapterName)
+    const chapter = useSelector(state => state.content.content.chapters.filter(c => c.description == description)[0])
 
-    const description = props.chapter.description
-    const [words, setWords] = useState([])    
+    const [words, setWords] = useState([])
 
     // Quiz settings
     const [showEnglish, setShowEnglish] = useState(true)
@@ -36,17 +62,17 @@ function VocabQuiz(props) {
         if (showEnglish) {
             if (checkAccents) {
                 correct = input == term.greek && caseInput == term.takesCase
-            }            
-            else {                
+            }
+            else {
                 correct = removeAccents(input) == removeAccents(term.greek)
             }
         }
         else {
             const correctWords = words[position].english.toLowerCase().replaceAll(';', ',').replaceAll(',', ' ').trim().split(/\s+/)
             const inputWords = input.toLowerCase().replaceAll(';', ',').replaceAll(',', ' ').trim().split(/\s+/)
-            correct = caseInput == term.takesCase                        
+            correct = caseInput == term.takesCase
             for (const cw of correctWords) {
-                if (!inputWords.includes(cw)) {                    
+                if (!inputWords.includes(cw)) {
                     correct = false
                     break
                 }
@@ -61,7 +87,7 @@ function VocabQuiz(props) {
             }
             else {
                 setComplete(true)
-                props.onComplete(description)
+                //props.onComplete(description)
             }
         }
         else {
@@ -81,13 +107,13 @@ function VocabQuiz(props) {
         setCaseInput('NA')
         setPosition(0)
         setNumFailed(0)
-        setAttempts(0)        
+        setAttempts(0)
         setStarted(false)
         setComplete(false)
     }
 
     const start = () => {
-        setWords(props.chapter.words
+        setWords(chapter.words
             .slice()
             .filter(t => pos.includes(t.type))
             .sort((a, b) => 0.5 - Math.random()))
@@ -99,17 +125,29 @@ function VocabQuiz(props) {
             return <span>{words[position].english}</span>
         }
         else {
-            return <strong style={{ fontFamily: "tahoma"}}>{words[position].greek}</strong>
+            return <strong style={{ fontFamily: "tahoma" }}>{words[position].greek}</strong>
         }
     }
 
     const displayInput = () => {
-        if (showEnglish) {
-            return <GreekInput value={input} onChange={setInput} />
+        const onChange = e => {
+            if (showEnglish) {
+                setInput(updateText(e))
+            }
+            else {
+                setInput(e.target.value)
+            }
         }
-        else {
-            return <Form.Control value={input} onChange={e => setInput(e.target.value)} />
-        }
+        return (
+            <TextField
+                value={input}
+                label={showEnglish ? "Greek" : "English"}
+                inputProps={{ style: { fontFamily: "tahoma", fontSize: "19px" } }}
+                sx={{ marginTop: '12px' }}
+                onChange={onChange}
+                size="small"
+                fullWidth />
+        )
     }
 
     const displayAttempt = () => {
@@ -129,7 +167,7 @@ function VocabQuiz(props) {
             return (<span>{term.english}</span>)
         }
     }
-    
+
 
 
     const renderTerm = () => {
@@ -137,104 +175,151 @@ function VocabQuiz(props) {
         if (!started) {
             return (
                 <Card>
-                    <Card.Body>
-                        <Card.Title>Quiz of {description}</Card.Title>
-                        <p>{props.chapter.words.length} terms</p>
-                        <Form>
-                            <Form.Group>
-                                <Form.Label>Quiz mode</Form.Label> <br />
-                                <Form.Check 
-                                    inline
-                                    label="English to greek"
-                                    type="radio"
-                                    checked={showEnglish}
-                                    onChange={e => setShowEnglish(e.target.checked)} />
-                                <Form.Check
-                                    inline
-                                    label="Greek to english"
-                                    type="radio"
-                                    checked={!showEnglish}
-                                    onChange={e => setShowEnglish(!e.target.checked)} />
-                            </Form.Group>
+                    <CardContent>
+                        <Typography variant="h6">Quiz of {description}</Typography>
+                        <p>{chapter.words.length} terms</p>
+                        <Stack spacing={2}>
+                            <FormControl>
+                                <FormLabel>Quiz mode</FormLabel>
+                                <RadioGroup row>
+                                    <FormControlLabel
+                                        checked={showEnglish}
+                                        control={<Radio />}
+                                        label="English to Greek"
+                                        onChange={e => setShowEnglish(e.target.checked)}
+                                        tabIndex={7} />
+                                    <FormControlLabel
+                                        checked={!showEnglish}
+                                        value={true}
+                                        control={<Radio />}
+                                        label="Greek to English"
+                                        tabIndex={8}
+                                        onChange={e => setShowEnglish(!e.target.checked)} />
+                                </RadioGroup>
+                            </FormControl>
                             <hr />
-                            <Form.Group>
-                                <Form.Label>Parts of speech</Form.Label> <br />
-                                {parts.map(p => (
-                                    <Form.Check 
-                                        inline 
-                                        key={`check_${p}`}
-                                        label={`${p.charAt(0).toUpperCase()}${p.substring(1)}s`}
-                                        checked={pos.includes(p)}
-                                        onChange={e => {e.target.checked ? setPOS([...pos, p]) : setPOS(pos.filter(part => part != p))}}/>
-                                ))}
-                            </Form.Group>
-                            <hr />
-                            <Form.Group>
-                                <Form.Check
-                                    type="switch"
+                            <FormControl>
+                                <FormLabel>Parts of speech</FormLabel>
+                                <RadioGroup row>
+                                    {parts.map(p => (
+                                        <FormControlLabel
+                                            control={<Checkbox />}
+                                            key={`check_${p}`}
+                                            label={`${p.charAt(0).toUpperCase()}${p.substring(1)}s`}
+                                            checked={pos.includes(p)}
+                                            onChange={e => { e.target.checked ? setPOS([...pos, p]) : setPOS(pos.filter(part => part != p)) }} />
+                                    ))}
+                                </RadioGroup>
+                            </FormControl>
+                            <FormControl>
+                                <FormLabel>Accents</FormLabel>
+                                <FormControlLabel
+                                    control={<Switch />}
                                     disabled={!showEnglish}
-                                    style={{marginTop: '10px', marginBottom: '10px'}}
+                                    style={{ marginTop: '10px', marginBottom: '10px' }}
                                     checked={checkAccents}
                                     label="Check Accents"
-                                    onChange={e => setCheckAccents(e.target.checked)}/>
-                            </Form.Group>
-                        </Form>
-                        <Button variant="primary" onClick={start}>Start</Button>
-                    </Card.Body>
+                                    onChange={e => setCheckAccents(e.target.checked)} />
+                            </FormControl>
+                        </Stack>
+                    </CardContent>
+                    <CardActions>
+                        <Button variant="outlined" onClick={start}>Start</Button>
+                    </CardActions>
                 </Card>
             )
         }
         else if (complete) {
             return (
                 <Card>
-                    <Card.Body>
-                        <Card.Title>Quiz Complete!</Card.Title>
-                        <strong>Terms studied:</strong> {words.length} <br />
-                        <strong># Correct:</strong> {attempts - numFailed} <br />
-                        <strong># Incorrect:</strong> {numFailed} <br />
-                        <strong>Accuracy:</strong> {(attempts - numFailed) / attempts * 100}% <br />
-                        <ButtonGroup style={{ marginTop: '15px' }}>
-                            <Button variant="success" onClick={restart}>Try Again</Button>
-                            <Button variant="success" onClick={props.goBack}>Back to chapter list</Button>
-                        </ButtonGroup>
-                    </Card.Body>
+                    <CardContent>
+                        <Typography variant="h5">Quiz Complete!</Typography>
+                        <Table size="small" sx={{ padding: '3px' }}>
+                            <TableBody>
+                                <TableRow>
+                                    <TableCell><strong>Terms studied</strong></TableCell>
+                                    <TableCell>{words.length}</TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell><strong># Correct</strong></TableCell>
+                                    <TableCell>{attempts - numFailed}</TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell><strong># Incorrect</strong></TableCell>
+                                    <TableCell>{numFailed}</TableCell>
+                                </TableRow>
+                                <TableRow>
+                                    <TableCell><strong>Accuracy</strong></TableCell>
+                                    <TableCell>{(attempts - numFailed) / attempts * 100}% </TableCell>
+                                </TableRow>
+                            </TableBody>
+                        </Table>
+                    </CardContent>
+                    <CardActions>
+                        <Button variant="outlined" onClick={restart}>Try Again</Button>
+                        <Button variant="outlined" color="secondary" onClick={() => dispatch(go([CHAPTER_LIST, {}]))}>Back to chapter list</Button>
+                    </CardActions>
                 </Card>
             )
         }
         else if (failed) {
             return (
                 <Card>
-                    <Card.Body>
-                        <Card.Title>{displayTerm()}</Card.Title>
-                        <Badge bg="danger">Incorrect</Badge> <br /><br />
-                        <span style={{ marginRight: '7px' }}>You entered: </span>
-                        {displayAttempt()}
-                        {caseInput != 'NA' ? <em> + {caseInput}</em> : null}
-                        <br />
-                        <span style={{ marginRight: '7px' }}>Correct was: </span>
-                        {displayAnswer()}
-                        {term.takesCase != 'NA' ? <em> + {term.takesCase}</em> : null}
-                        <br /><br />
-                        <Button variant="primary" onClick={reset}>Ok</Button>
-                    </Card.Body>
+                    <CardContent>
+                        <Stack>
+                            <Typography variant="h5">{displayTerm()}</Typography>
+                            <Box sx={{ border: '2px solid red', borderRadius: '3.5px', marginTop: '10px' }}>
+                                <Table size="small">
+                                    <TableBody>
+                                        <TableRow>
+                                            <TableCell><strong>Your Answer</strong></TableCell>
+                                            <TableCell>
+                                                {displayAttempt()}
+                                                {caseInput != 'NA' ? <em> + {caseInput}</em> : null}
+                                            </TableCell>
+                                        </TableRow>
+                                        <TableRow>
+                                            <TableCell><strong>Expected</strong></TableCell>
+                                            <TableCell>
+                                                {displayAnswer()}
+                                                {term.takesCase != 'NA' ? <em> + {term.takesCase}</em> : null}
+                                            </TableCell>
+                                        </TableRow>
+                                    </TableBody>
+                                </Table>
+                            </Box>
+                        </Stack>
+                    </CardContent>
+                    <CardActions>
+                        <Button variant="outlined" onClick={reset}>Ok</Button>
+                    </CardActions>
                 </Card>
             )
         }
         return (
             <Card>
-                <Card.Body>
-                    <Card.Title>{displayTerm()}</Card.Title>
+                <CardContent>
+                    <Typography variant="h5">{displayTerm()}</Typography>
                     {displayInput()}
-                    <select style={{ marginTop: '8px' }} className="form-control" value={caseInput} onChange={e => setCaseInput(e.target.value)}>
-                        <option value={'NA'}>NA</option>
-                        <option value={'nominative'}>Nominative</option>
-                        <option value={'genitive'}>Genitive</option>
-                        <option value={'dative'}>Dative</option>
-                        <option value={'accusative'}>Accusative</option>
-                        <option value={'vocative'}>Vocative</option>
-                    </select>
-                    <Button variant="primary" style={{ marginTop: '15px' }} onClick={check}>Check</Button>
-                </Card.Body>
+                    <TextField
+                        label="Special case"
+                        fullWidth
+                        sx={{ marginTop: '15px' }}
+                        value={caseInput}
+                        onChange={e => setCaseInput(e.target.value)}
+                        select size="small"
+                    >
+                        <MenuItem value={'NA'}>NA</MenuItem>
+                        <MenuItem value={'nominative'}>Nominative</MenuItem>
+                        <MenuItem value={'genitive'}>Genitive</MenuItem>
+                        <MenuItem value={'dative'}>Dative</MenuItem>
+                        <MenuItem value={'accusative'}>Accusative</MenuItem>
+                        <MenuItem value={'vocative'}>Vocative</MenuItem>
+                    </TextField>
+                </CardContent>
+                <CardActions>
+                    <Button variant="outlined" style={{ marginTop: '15px' }} onClick={check}>Check</Button>
+                </CardActions>
             </Card>
         )
     }
@@ -253,18 +338,18 @@ function VocabQuiz(props) {
 
     return (
         <Container>
-            <Row>
-                <Col md={8}>
-                    <h4 style={{ marginTop: '15px', marginBottom: '15px' }}>Studying {description}</h4>
-                </Col>
-                <Col md={4}>
-                    <Button variant="link" tabIndex={-1} style={{ float: 'right' }} onClick={props.goBack}>Back to chapter list</Button>
-                </Col>
-            </Row>
-            <Row>
-                {header()}
-                {renderTerm()}
-            </Row>
+            <Grid container>
+                <Grid item md={10}>
+                    <Typography variant="h5" style={{ marginTop: '15px', marginBottom: '15px' }}>Studying {description}</Typography>
+                </Grid>
+                <Grid item md={2} sx={{ display: 'flex', alignItems: 'center' }}>
+                    <Button color="secondary" tabIndex={-1} style={{ float: 'right' }} onClick={() => dispatch(go([CHAPTER_LIST, {}]))}>Back to chapter list</Button>
+                </Grid>
+                <Grid item md={12}>
+                    {header()}
+                    {renderTerm()}
+                </Grid>
+            </Grid>
         </Container>
     )
 }

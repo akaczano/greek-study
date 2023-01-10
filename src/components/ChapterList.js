@@ -1,8 +1,28 @@
 import { useState } from 'react'
-import { Container, ListGroup, Button, Row, Col, ButtonGroup, Modal, Form } from 'react-bootstrap'
+import { useDispatch, useSelector } from 'react-redux'
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import DescriptionIcon from '@mui/icons-material/Description';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { IconButton, ListItemButton, ListItemText } from '@mui/material';
+import Container from '@mui/material/Container';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent'
+import DialogContentText from '@mui/material/DialogContentText'
+import TextField from '@mui/material/TextField';
+
+import { addChapter, deleteChapter } from '../state/contentSlice'
+import { go, CHAPTER_VIEW, VOCAB_QUIZ } from '../state/navSlice'
 
 function ChapterList(props) {
-    const chapters = props.vocab
+    const dispatch = useDispatch()
+    const chapters = useSelector(state => state.content.content.chapters)
+    const readOnly = useSelector(state => state.content.readOnly)
 
     const compareChapters = (a, b) => a.description.localeCompare(b.description)
 
@@ -17,41 +37,50 @@ function ChapterList(props) {
 
     return (
         <Container>
-            <Modal size="md" show={showModal} onHide={() => setShowModal(false)}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Add Chapter</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <Form>
-                        <Form.Group>
-                            <Form.Label>Description</Form.Label>
-                            <Form.Control type="text" value={description} onChange={e => setDescription(e.target.value)} />
-                        </Form.Group>
-                    </Form>
-                </Modal.Body>
-                <Modal.Footer>
-                    <ButtonGroup>
-                        <Button variant="primary" onClick={() => { setShowModal(false); props.onAdd(description) }}>Save</Button>
-                        <Button variant="primary" onClick={() => setShowModal(false)}>Cancel</Button>
-                    </ButtonGroup>
-                </Modal.Footer>
-            </Modal>
-            <Modal size="md" show={toDelete} onHide={() => setToDelete(null)}>
-                <Modal.Header closeButton>
-                    Confirm delete
-                </Modal.Header>
-                <Modal.Body>
-                    Are you sure you want to delete <strong>{toDelete}</strong>?
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="danger" onClick={() => { props.onDelete(toDelete); setToDelete(null) }}>Confirm</Button>
-                    <Button variant="secondary" onClick={() => setToDelete(null)}>Cancel</Button>
-                </Modal.Footer>
-            </Modal>            
-            <ListGroup style={{ maxHeight: '75vh', overflowY: 'auto' }}>
+            <Dialog
+                open={toDelete}
+                onClose={() => setToDelete(null)}
+            >
+                <DialogTitle>
+                    {"Confirm Delete"}
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-description">
+                        Are you sure you want to delete the chapter <strong>{toDelete}</strong>? There will be
+                        no way to recover those terms.
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => { dispatch(deleteChapter(toDelete)); setToDelete(null) }} color="error">Confirm</Button>
+                    <Button onClick={() => setToDelete(null)} autoFocus>Cancel</Button>
+                </DialogActions>
+            </Dialog>
+            <Dialog open={showModal} onClose={() => setShowModal(false)} fullWidth>
+                <DialogTitle>Add Chapter</DialogTitle>
+                <DialogContent>
+                    <TextField
+                        autoFocus
+                        margin="dense"
+                        id="name"
+                        label="description"
+                        type="email"
+                        fullWidth
+                        variant="standard"
+                        value={description}
+                        onChange={e => setDescription(e.target.value)}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setShowModal(false)}>Cancel</Button>
+                    <Button onClick={() => { setShowModal(false); dispatch(addChapter(description)) }}>Confirm</Button>
+                </DialogActions>
+            </Dialog>
+            <Typography variant="h5" component="h5">
+                Chapter List
+            </Typography>
+            <List style={{ maxHeight: '65vh', overflowY: 'auto', border: '1px solid #b7cbeb', borderRadius: '2px', marginTop: '5px' }} dense={false}>
                 {chapters.slice().sort(compareChapters).map(c => {
-                    const {
-                        attempts,
+                    const {                        
                         last_studied,
                         words,
                         description
@@ -60,31 +89,23 @@ function ChapterList(props) {
                     const message = last_studied ? `Last studied: ${new Date(last_studied).toLocaleDateString()}` : 'Never studied'
 
                     return (
-                        <ListGroup.Item key={description}>
-                            <Row>
-                                <Col md={8}>
-                                    <strong style={{ fontSize: '18px' }}>{description}</strong> ({words.length} terms)
-                                    <p>
-                                        {attempts} attempts, {message}
-                                    </p>
-                                </Col>
-                                <Col md={4}>
-                                    <ButtonGroup style={{ float: 'right' }}>
-                                        <Button variant="primary" onClick={() => props.onEdit(description)}>
-                                            { props.readonly ? "View" : "Edit"}
-                                        </Button>
-                                        <Button variant="primary" onClick={() => props.onStudy(description)} disabled={words.length < 1}>Study</Button>
-                                        <Button variant="danger" disabled={props.readonly} onClick={() => setToDelete(description)}>Delete</Button>
-                                    </ButtonGroup>
-                                </Col>
-                            </Row>
-                        </ListGroup.Item>
+                        <ListItem key={description} secondaryAction={
+                            <IconButton edge="end" aria-label="delete" disabled={readOnly} onClick={() => setToDelete(description)}>
+                                <DeleteIcon />
+                            </IconButton>
+                        }>
+                            <ListItemButton onClick={() => dispatch(go([CHAPTER_VIEW, { chapterName: description }]))}>
+                                <ListItemIcon> <DescriptionIcon /></ListItemIcon>
+                                <ListItemText primary={description} secondary={`${words.length} terms`} />
+                            </ListItemButton>
+                            <Button onClick={() => dispatch(go([VOCAB_QUIZ, { chapterName: description}]))}>Practice</Button>
+                        </ListItem>
                     )
                 })}
 
-            </ListGroup>
+            </List>
 
-            <Button variant="primary" style={{ marginTop: '15px' }} onClick={addNew} disabled={props.readonly}>
+            <Button variant="outlined" style={{ marginTop: '15px', marginBottom: '20px' }} onClick={addNew} disabled={readOnly}>
                 New Chapter
             </Button>
         </Container>

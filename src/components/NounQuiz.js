@@ -1,20 +1,23 @@
 import { useState, useEffect } from 'react'
 import { removeAccents } from '../util/greek'
-import { Row, Col, Card, Button, Form, ButtonGroup } from 'react-bootstrap'
+import { Row } from 'react-bootstrap'
+import { Container, Typography, Card, CardContent, CardActions, Button, MenuItem, TextField, Grid } from '@mui/material'
+import { useDispatch, useSelector } from 'react-redux'
 
-import GreekInput from './GreekInput'
+import { updateText } from '../util/input'
+import { go, NOUNS } from '../state/navSlice'
 
 const getCase = i => ['Nominative', 'Genitive', 'Dative', 'Accusative', 'Vocative'][i % 5]
 
 const getNumber = i => i < 5 ? 'Singular' : 'Plural'
 
 function NounQuiz(props) {
-    const {
-        vocab,
-        charts,
-        settings
-    } = props
-    
+    const dispatch = useDispatch()
+    const vocab = useSelector(state => state.content.content.chapters)
+    const charts = useSelector(state => state.content.content.declensions)
+    const { settings } = useSelector(state => state.nav.params)
+
+
     const [total, setTotal] = useState(0)
     const [incorrect, setIncorrect] = useState(0)
     const [generator, setGenerator] = useState(null)
@@ -26,22 +29,22 @@ function NounQuiz(props) {
     const [caseInput, setCaseInput] = useState(0)
     const [numberInput, setNumberInput] = useState(0)
 
-    const predicate = pattern => term => {        
+    const predicate = pattern => term => {
         const patterns = pattern.split('|')
         for (const p of patterns) {
             if (removeAccents(term.greek).endsWith(removeAccents(p))) return true
-        }        
+        }
         return false
     }
 
 
-    useEffect(() => {        
+    useEffect(() => {
         let relevantVocab = vocab
             .flatMap(v => v.words)
             .filter(v => v.type == 'noun')
             .filter(v => v.greek.includes(','))
-            .filter(v => charts.filter(c => settings.filter == 'all' || settings.filter == c.description).some(c => predicate(c.pattern)(v)))        
-        
+            .filter(v => charts.filter(c => settings.filter == 'all' || settings.filter == c.description).some(c => predicate(c.pattern)(v)))
+
         const generator = () => {
             const length = relevantVocab.length - 1
             const word = relevantVocab[Math.round(length * Math.random())]
@@ -51,7 +54,7 @@ function NounQuiz(props) {
             const pattern = chart.pattern.split('|').filter(p => removeAccents(word.greek).endsWith(removeAccents(p)))[0]
             const ending = chart.chart[caseIndex]
 
-            
+
             let greek = removeAccents(word.greek).substring(0, removeAccents(word.greek).indexOf(removeAccents(pattern))) + ending
 
             if (settings.articles) {
@@ -67,7 +70,7 @@ function NounQuiz(props) {
                 }
                 if (articleChart) {
                     console.log(articleChart)
-                    greek = articleChart.chart[caseIndex] + ' ' + greek                    
+                    greek = articleChart.chart[caseIndex] + ' ' + greek
                 }
             }
 
@@ -94,18 +97,18 @@ function NounQuiz(props) {
 
 
         if (settings.mode == 0) {
-            return <strong style={{fontFamily: 'Tahoma'}}>{term?.greek}</strong>
+            return <Typography variant="h5" style={{ fontFamily: 'Tahoma' }}>{term?.greek}</Typography>
         }
         else if (settings.mode == 1) {
-            return (<>
+            return (<div style={{ marginBottom: '12px' }}>
                 <span>{term?.english}</span>
                 <em style={{ fontSize: '15px', marginLeft: '5px', color: 'gray' }}>in the {getCase(term.caseIndex)} {getNumber(term.caseIndex)}</em>
-            </>)
+            </div>)
         }
     }
 
     const check = () => {
-        if (show) {            
+        if (show) {
             setWrong(false)
             setShow(false)
             setIncorrect(incorrect + 1)
@@ -119,7 +122,7 @@ function NounQuiz(props) {
         if (settings.mode == 0) {
             correct = textInput.toUpperCase(0) == term.english.toUpperCase() && (caseInput + (5 * numberInput)) == term.caseIndex
         }
-        else if (settings.mode == 1) {            
+        else if (settings.mode == 1) {
             correct = removeAccents(textInput) == removeAccents(term.greek)
         }
 
@@ -133,77 +136,89 @@ function NounQuiz(props) {
         else {
             setWrong(true)
         }
-
     }
 
     const displayInput = () => {
         if (settings.mode == 0) {
             if (show) {
                 return (
-                    <Row>
-                        <Col>
+                    <Grid container>
+                        <Grid item>
                             {term.english}
-                        </Col>
-                        <Col>
+                        </Grid>
+                        <Grid item>
                             {getCase(term.caseIndex % 5)}
-                        </Col>
-                        <Col>
+                        </Grid>
+                        <Grid item>
                             {getNumber(term.caseIndex)}
-                        </Col>
-                    </Row>
+                        </Grid>
+                    </Grid>
                 )
             }
             return (
-                <Row>
-                    <Col>
-                        <Form.Control type="text" value={textInput} onChange={e => setTextInput(e.target.value)} />
-                    </Col>
-                    <Col>
-                        <select className="form-control" value={caseInput} onChange={e => setCaseInput(parseInt(e.target.value))}>
-                            <option value={0}>Nominative</option>
-                            <option value={1}>Genitive</option>
-                            <option value={2}>Dative</option>
-                            <option value={3}>Accusative</option>
-                            <option value={4}>Vocative</option>
-                        </select>
-                    </Col>
-                    <Col>
-                        <select className="form-control" value={numberInput} onChange={e => setNumberInput(parseInt(e.target.value))}>
-                            <option value={0}>Singular</option>
-                            <option value={1}>Plural</option>
-                        </select>
-                    </Col>
-                </Row>
+                <Grid container columnSpacing={1} sx={{ marginTop: '10px'}}>
+                    <Grid item md={3} xs={4}>
+                        <TextField
+                            size="small"
+                            value={textInput}
+                            fullWidth
+                            onChange={e => setTextInput(e.target.value)}
+                            label='translation' />
+                    </Grid>
+                    <Grid item md={3} xs={4}>
+                        <TextField size="small" select value={caseInput} onChange={e => setCaseInput(parseInt(e.target.value))} fullWidth label="Case">
+                            <MenuItem value={0}>Nominative</MenuItem>
+                            <MenuItem value={1}>Genitive</MenuItem>
+                            <MenuItem value={2}>Dative</MenuItem>
+                            <MenuItem value={3}>Accusative</MenuItem>
+                            <MenuItem value={4}>Vocative</MenuItem>
+                        </TextField>
+                    </Grid>
+                    <Grid item md={3} xs={4}>
+                        <TextField select value={numberInput} onChange={e => setNumberInput(parseInt(e.target.value))} size="small" fullWidth label="Number">
+                            <MenuItem value={0}>Singular</MenuItem>
+                            <MenuItem value={1}>Plural</MenuItem>
+                        </TextField>
+                    </Grid>
+                    <Grid item md={3} xs={0}></Grid>
+                </Grid>
             )
         }
         else if (settings.mode == 1) {
             if (show) {
                 return term.greek
             }
-            return <GreekInput value={textInput} onChange={t => setTextInput(t)} />
+            return (
+                <TextField
+                    size="small"
+                    label="Greek"
+                    value={textInput}
+                    inputProps={{ style: { fontFamily: "tahoma", fontSize: "19px" } }}
+                    onChange={e => setTextInput(updateText(e))} />
+            )
         }
     }
-    
+
     return (
 
-        <>
-            <Row>
-                <h5>Noun practice</h5>
-                <Card>
-                    <Card.Body>
-                        <Card.Title>{displayPrompt()}</Card.Title> <br />
-                        {displayInput()}
-                        <br /> {wrong ? (<p style={{ color: 'red' }}>Incorrect</p>) : null}
-                        <ButtonGroup>
-                            <Button variant="primary" onClick={check}>{show ? 'Next' : 'Check'}</Button>
-                            <Button variant="primary" onClick={() =>    setShow(true)}>Show Answer</Button>
-                            <Button variant="secondary" onClick={props.back}>Back to chart list</Button>
-                        </ButtonGroup>
+        <Container>
 
-                    </Card.Body>
-                </Card>
-            </Row>
-        </>
+            <Typography variant="h5">Noun practice</Typography>
+
+            <Card>
+                <CardContent>
+                    <Typography variant="h6">{displayPrompt()}</Typography>
+                    {displayInput()}
+                    <br /> {wrong ? (<p style={{ color: 'red' }}>Incorrect</p>) : null}
+                </CardContent>
+                <CardActions>
+                    <Button variant="outlined" onClick={check}>{show ? 'Next' : 'Check'}</Button>
+                    <Button variant="outlined" onClick={() => setShow(true)}>Show Answer</Button>
+                    <Button variant="outlined" color="secondary" onClick={() => dispatch(go([NOUNS, {}]))}>Back to chart list</Button>
+                </CardActions>
+            </Card>
+
+        </Container>
 
     )
 }

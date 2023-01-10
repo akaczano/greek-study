@@ -1,134 +1,176 @@
 import { useState } from 'react'
-import { ListGroup, Button, ButtonGroup, Card, Modal, Form, Row, Col } from 'react-bootstrap'
+import {
+    Button,
+    ButtonGroup,
+    IconButton,
+    List,
+    ListItem,
+    ListItemButton,
+    ListItemText,
+    ListItemIcon,
+    Container,
+    Dialog,
+    DialogContent,
+    DialogTitle,
+    DialogActions,
+    DialogContentText,
+    Typography,
+    Radio,
+    RadioGroup,
+    FormControl,
+    FormControlLabel,
+    FormLabel,
+    Grid,
+    TextField,
+    Checkbox,
+    MenuItem
+} from '@mui/material'
+import DeleteIcon from '@mui/icons-material/Delete';
+import TableViewIcon from '@mui/icons-material/TableView';
+import { useDispatch, useSelector } from 'react-redux'
 
-function Nouns(props) {
+import { go, CHART_DISPLAY, CHART_QUIZ, NOUN_QUIZ } from '../state/navSlice'
+import { updateChart, deleteChart } from '../state/contentSlice'
+
+function Nouns() {
+    const dispatch = useDispatch()
+    let charts = useSelector(state => state.content.content.declensions.slice())
+    const readOnly = useSelector(state => state.content.readOnly)
 
     const [description, setDescription] = useState(null)
     const [deleting, setDeleting] = useState(null)
 
-    const [settings, setSettings] = useState({
-        mode: 0,
-        filter: 'all',
-        articles: false
-    })
+    const [settings, setSettings] = useState(null)
 
     const add = () => {
-        props.onAdd({ description, pattern: '', chart: null })
+        dispatch(updateChart({ description, pattern: '', chart: null }))
         setDescription(null)
     }
 
-    const deleteChart = () => {
-        props.delete(deleting)
+    const delChart = () => {
+        dispatch(deleteChart(deleting))
         setDeleting(null)
     }
 
     return (
-        <div>
-            <Modal show={description != null} onHide={() => setDescription(null)}>
-                <Modal.Header closeButton>
-                    Create new chart
-                </Modal.Header>
-                <Modal.Body>
-                    <Form>
-                        <Form.Group>
-                            <Form.Label>Description</Form.Label>
-                            <Form.Control type="text" value={description} onChange={e => setDescription(e.target.value)} />
-                        </Form.Group>
-                    </Form>
-                </Modal.Body>
-                <Modal.Footer>
-                    <ButtonGroup>
-                        <Button variant="primary" onClick={add}>Add</Button>
-                        <Button variant="primary" onClick={() => setDescription(null)}>Cancel</Button>
-                    </ButtonGroup>
-                </Modal.Footer>
-            </Modal>
-            <Modal show={deleting} onHide={() => setDeleting(null)}>
-                <Modal.Header closeButton>
-                    Confirm deletion
-                </Modal.Header>
-                <Modal.Body>
-                    <p>
-                        Are you sure you want to delete chart {deleting}
-                    </p>
-                </Modal.Body>
-                <Modal.Footer>
-                    <ButtonGroup>
-                        <Button variant="danger" onClick={deleteChart}>Confirm</Button>
-                        <Button variant="secondary" onClick={() => setDeleting(null)}>Cancel</Button>
-                    </ButtonGroup>
-                </Modal.Footer>
-            </Modal>
-            <ListGroup style={{ maxHeight: '35vh', overflowY: 'auto' }}>
-                {props.charts?.sort((a, b) => a.description.localeCompare(b.description)).map(c => {
+        <Container>
+            <Dialog open={description != null} onClose={() => setDescription(null)} fullWidth>
+                <DialogTitle>Create new chart
+                </DialogTitle>
+                <DialogContent>                                                
+                    <TextField
+                        sx={{ marginTop: '5px' }}
+                        label="Description"
+                        value={description}
+                        fullWidth
+                        onChange={e => setDescription(e.target.value)} />                        
+                </DialogContent>
+                <DialogActions>
+                    <Button variant="outlined" onClick={add}>Add</Button>
+                    <Button variant="outlined" onClick={() => setDescription(null)}>Cancel</Button>
+                </DialogActions>
+            </Dialog>
+            <Dialog open={deleting} onClose={() => setDeleting(null)}>
+                <DialogTitle>Confirm deletion</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Are you sure you want to delete chart {deleting}?
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button variant="outlined" color="error" onClick={delChart}>Confirm</Button>
+                    <Button variant="outlined" onClick={() => setDeleting(null)}>Cancel</Button>
+                </DialogActions>
+            </Dialog>
+            <Dialog open={settings} onClose={() => setSettings(null)} >
+                <DialogTitle>Noun Practice</DialogTitle>
+                <DialogContent>
+                    <Grid container rowSpacing={2} columnSpacing={2}>
+                        <Grid item md={12}>
+                            <FormControl>
+                                <FormLabel>Mode</FormLabel>
+                                <RadioGroup row>
+                                    <FormControlLabel
+                                        checked={settings?.mode == 0}
+                                        control={<Radio />}
+                                        label="Greek ⇒ English, case"
+                                        onChange={e => setSettings({ ...settings, mode: e.target.checked ? 0 : 1 })}
+                                        tabIndex={7} />
+                                    <FormControlLabel
+                                        checked={settings?.mode == 1}
+                                        value={true}
+                                        control={<Radio />}
+                                        label="English, case ⇒ Greek"
+                                        tabIndex={8}
+                                        onChange={e => setSettings({ ...settings, mode: e.target.checked ? 1 : 0 })} />
+                                </RadioGroup>
+                            </FormControl>
+                        </Grid>
+
+                        <Grid item md={12} xs={12}>
+                            <FormControl>
+                                <FormLabel>Use chart</FormLabel>
+                                <TextField
+                                    select
+                                    size="small"
+                                    fullWidth
+                                    value={settings?.filter}
+                                    sx={{ marginTop: '4px' }}
+                                    onChange={e => setSettings({ ...settings, filter: e.target.value })}>
+                                    <MenuItem value='all'>All charts</MenuItem>
+                                    {charts.map(c => {
+                                        const { description } = c
+                                        return (
+                                            <MenuItem key={description + '_selectkey'} value={description}>{description}</MenuItem>
+                                        )
+                                    })}
+                                </TextField>
+                            </FormControl>
+                        </Grid>
+                        <Grid item md={12} xs={12}>
+                            <FormControl>
+                                <FormLabel>Article Setting</FormLabel>
+                                <FormControlLabel    
+                                    label="Include article"                                
+                                    control={<Checkbox checked={settings?.articles}
+                                    onChange={e => setSettings({ ...settings, articles: e.target.checked })} />} />                                
+                            </FormControl>
+                        </Grid>
+                    </Grid>
+                </DialogContent>
+                <DialogActions>
+                    <Button variant="outlined" onClick={() => dispatch(go([NOUN_QUIZ, { settings }]))}>Start</Button>
+                    <Button variant="outlined" onClick={() => setSettings(null)}>Cancel</Button>
+                </DialogActions>
+            </Dialog>
+            <Typography component="h5" variant="h5">Noun Forms</Typography>
+            <List style={{ maxHeight: '70vh', overflowY: 'auto', marginTop: '5px', marginBottom: '5px', border: '1px solid #b7cbeb', borderRadius: '2px' }}>
+                {charts?.sort((a, b) => a.description.localeCompare(b.description)).map(c => {
                     return (
-                        <ListGroup.Item key={c.description}>
-                            <span style={{ fontSize: '16px' }}>{c.description}</span>
-                            <ButtonGroup style={{ float: 'right' }}>
-                                <Button variant="primary" onClick={() => props.onSelect(c.description)}>
-                                    {props.readonly ? "View" : "Edit"}
-                                </Button>
-                                <Button variant="primary" disabled={!c.chart} onClick={() => props.onStudy(c.description)}>Study</Button>
-                                <Button variant="danger" onClick={() => setDeleting(c.description)} disabled={props.readonly}>Delete</Button>
-                            </ButtonGroup>
-                        </ListGroup.Item>
+                        <ListItem key={c.description}>
+                            <ListItemButton onClick={() => dispatch(go([CHART_DISPLAY, { chartName: c.description }]))}>
+                                <ListItemIcon><TableViewIcon /> </ListItemIcon>
+                                <ListItemText primary={c.description} />
+                            </ListItemButton>
+                            <Button variant="outlined" disabled={!c.chart} onClick={() => dispatch(go([CHART_QUIZ, { chartName: c.description }]))}>
+                                Practice
+                            </Button>
+                            <IconButton onClick={() => setDeleting(c.description)} disabled={readOnly}>
+                                <DeleteIcon />
+                            </IconButton>
+                        </ListItem>
                     )
                 })}
-            </ListGroup>
-            <Button disabled={props.readonly} style={{ marginTop: '15px' }} onClick={() => setDescription('')}>Add chart</Button>
-            <hr />
-            <Card>
-                <Card.Header><strong>Practice</strong></Card.Header>
-                <Card.Body>
-                    <Form>
-                        <Form.Group>
-                            <Form.Label>Mode</Form.Label> <br />
-                            <Form.Check
-                                inline
-                                checked={settings.mode == 0}
-                                label="Greek -> English, case"
-                                type="radio"
-                                onChange={e => setSettings({ ...settings, mode: e.target.checked ? 0 : 1 })}
-                            />
-                            <Form.Check
-                                inline
-                                checked={settings.mode == 1}
-                                label="English, case -> Greek"
-                                type="radio"
-                                onChange={e => setSettings({ ...settings, mode: e.target.checked ? 1 : 0 })}
-                            />
-                        </Form.Group>
-                        <Row>
-                            <Col>
-                                <Form.Group>
-                                    <Form.Label>Use chart</Form.Label>
-                                    <select className="form-control" value={settings.filter} onChange={e => setSettings({ ...settings, filter: e.target.value })}>
-                                        <option value='all'>All charts</option>
-                                        {props.charts.map(c => {
-                                            const { description } = c
-                                            return (
-                                                <option key={description + '_selectkey'} value={description}>{description}</option>
-                                            )
-                                        })}
-                                    </select>
-                                </Form.Group> <br />
-                            </Col>
-                            <Col>
-                                <Form.Group>
-                                    <Form.Label>Article Setting</Form.Label>
-                                    <Form.Check
-                                        type="switch"
-                                        label="Include article"
-                                        onChange={e => setSettings({ ...settings, articles: e.target.checked })}
-                                        value={settings.articles} />
-                                </Form.Group>
-                            </Col>
-                        </Row>
-                        <Button variant="primary" onClick={() => props.onQuiz(settings)}>Start</Button>
-                    </Form>
-                </Card.Body>
-            </Card>
-        </div>
+            </List>
+            <ButtonGroup>
+                <Button variant="outlined" disabled={readOnly} onClick={() => setDescription('')}>
+                    Add chart
+                </Button>
+                <Button variant="outlined" onClick={() => setSettings({ mode: 0, filter: 'all', articles: false })}>
+                    Study
+                </Button>
+            </ButtonGroup>
+        </Container>
     )
 }
 
