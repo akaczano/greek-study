@@ -137,7 +137,7 @@ function ChartDisplay(props) {
                                             value={chart[i]}
                                             onChange={e => modifyChart(i, updateText(e))}
                                             error={invalid.includes(i)}
-                                            disabled={readOnly} />
+                                            disabled={readOnly && !props.study} />
                                     </TableCell>
                                     <TableCell>
                                         <TextField
@@ -146,7 +146,7 @@ function ChartDisplay(props) {
                                             value={chart[pi]}
                                             onChange={e => modifyChart(pi, updateText(e))}
                                             error={invalid.includes(pi)}
-                                            disabled={readOnly} />
+                                            disabled={readOnly && !props.study} />
                                     </TableCell>
                                 </TableRow>
                             )

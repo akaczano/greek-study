@@ -13,8 +13,7 @@ import MenuItem from '@mui/material/MenuItem';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { useDispatch } from 'react-redux'
 
-import { go, CHAPTER_LIST, NOUNS, VERBS, KEYBOARD } from '../state/navSlice'
-import { Co2Sharp } from '@mui/icons-material';
+import { go, LANDING, CHAPTER_LIST, NOUNS, VERBS, KEYBOARD } from '../state/navSlice'
 
 const pages = ['Vocabulary', 'Nouns', 'Verbs'];
 const settings = ['Keyboard', 'Vocab and Charts'];
@@ -70,8 +69,8 @@ function NavBar() {
             variant="h5"
             noWrap
             component="a"
-            href="/"
-            tabIndex={-1}
+            onClick={() => dispatch(go([LANDING, {}]))}
+            tabIndex={-1}            
             sx={{
               mr: 2,
               display: { xs: 'none', md: 'flex' },
@@ -80,6 +79,7 @@ function NavBar() {
               letterSpacing: '.1rem',
               color: 'inherit',
               textDecoration: 'none',
+              cursor: 'pointer'
             }}
           >
             θεωρία

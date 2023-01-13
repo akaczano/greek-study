@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { removeAccents } from '../util/greek'
-import { Row } from 'react-bootstrap'
 import { Container, Typography, Card, CardContent, CardActions, Button, MenuItem, TextField, Grid } from '@mui/material'
 import { useDispatch, useSelector } from 'react-redux'
 

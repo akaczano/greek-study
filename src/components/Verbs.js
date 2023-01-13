@@ -49,7 +49,7 @@ function Verbs() {
             </Dialog>
 
             <Typography variant="h5" component="h5">Verb Forms</Typography>
-            <List style={{maxHeight: "70vh", overflowY: "auto", marginTop: "5px", border: '1px solid #b7cbeb', borderRadius: '2px' }}>
+            <List style={{maxHeight: "65vh", overflowY: "auto", marginTop: "5px", border: '1px solid #b7cbeb', borderRadius: '2px' }}>
                 {charts.sort((a, b) => a.description.localeCompare(b.description)).map(c => {
                     return (
                         <ListItem key={c.description}>
@@ -57,7 +57,7 @@ function Verbs() {
                                 <ListItemIcon><TableViewIcon /></ListItemIcon>
                                 <ListItemText primary={c.description} />
                             </ListItemButton>
-                            <Button variant="outlined" disabled={!c.chart} onClick={() => dispatch(go([VERB_QUIZ, { chartName: c.description }]))}>
+                            <Button disabled={!c.chart} onClick={() => dispatch(go([VERB_QUIZ, { chartName: c.description }]))}>
                                 Practice
                             </Button>
                             <IconButton onClick={() => { dispatch(deleteVerbChart(c.description)) }} disabled={readOnly}>

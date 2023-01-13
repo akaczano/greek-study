@@ -144,7 +144,7 @@ function Nouns() {
                 </DialogActions>
             </Dialog>
             <Typography component="h5" variant="h5">Noun Forms</Typography>
-            <List style={{ maxHeight: '70vh', overflowY: 'auto', marginTop: '5px', marginBottom: '5px', border: '1px solid #b7cbeb', borderRadius: '2px' }}>
+            <List style={{ maxHeight: '65vh', overflowY: 'auto', marginTop: '5px', marginBottom: '5px', border: '1px solid #b7cbeb', borderRadius: '2px' }}>
                 {charts?.sort((a, b) => a.description.localeCompare(b.description)).map(c => {
                     return (
                         <ListItem key={c.description}>
@@ -152,7 +152,7 @@ function Nouns() {
                                 <ListItemIcon><TableViewIcon /> </ListItemIcon>
                                 <ListItemText primary={c.description} />
                             </ListItemButton>
-                            <Button variant="outlined" disabled={!c.chart} onClick={() => dispatch(go([CHART_QUIZ, { chartName: c.description }]))}>
+                            <Button disabled={!c.chart} onClick={() => dispatch(go([CHART_QUIZ, { chartName: c.description }]))}>
                                 Practice
                             </Button>
                             <IconButton onClick={() => setDeleting(c.description)} disabled={readOnly}>
