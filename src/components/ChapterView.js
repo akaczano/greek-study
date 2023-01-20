@@ -83,7 +83,7 @@ function ChapterView() {
             </List>
             <ButtonGroup style={{ marginTop: '15px' }}>
                 <Button variant="outlined" onClick={onNew} disabled={readOnly}>Add term</Button>
-                <Button variant="outlined" onClick={() => dispatch(go([VOCAB_QUIZ, { chapterName }]))} disabled={readOnly}>Practice</Button>
+                <Button variant="outlined" onClick={() => dispatch(go([VOCAB_QUIZ, { chapterName }]))}>Practice</Button>
                 <Button variant="outlined" onClick={() => dispatch(go([CHAPTER_LIST, {}]))}>Back to List</Button>
             </ButtonGroup>
         </Container>
