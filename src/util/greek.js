@@ -109,8 +109,7 @@ export const mapVowel = (v, update) => {
     }
 
 
-export const removeAccents = text => {
-    console.log(text)
+export const removeAccents = text => {    
     let newText = ''
     for (let i = 0; i < text.length; i++) {
         const c = text.charAt(i)

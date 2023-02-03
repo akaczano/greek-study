@@ -31,6 +31,7 @@ import { updateText } from '../util/input'
 import { Box } from '@mui/system'
 
 const parts = ['verb', 'noun', 'adjective', 'other']
+const principalParts = [true, true, true, true, true, true]
 
 function VocabQuiz() {
     const dispatch = useDispatch()
@@ -43,6 +44,7 @@ function VocabQuiz() {
     const [showEnglish, setShowEnglish] = useState(true)
     const [pos, setPOS] = useState(parts)
     const [checkAccents, setCheckAccents] = useState(true)
+    const [pps, setPPs] = useState(principalParts)
 
     const [position, setPosition] = useState(0)
     const [complete, setComplete] = useState(false)
@@ -56,25 +58,58 @@ function VocabQuiz() {
     const term = words[position]
 
 
-    const check = () => {
-        setAttempts(attempts + 1)
-        let correct = false
-        if (showEnglish) {
-            if (checkAccents) {
-                correct = input == term.greek && caseInput == term.takesCase
+    const formatVerb = verbInput => {
+        const inputs = verbInput.replace('...', '-,-').split(',')
+        let output = ''
+        let buffer = ''
+        for (let i = 0; i < inputs.length; i++) {
+            if (pps[i]) {
+                if (output.length > 0) {
+                    output += ','
+                }
+                if (buffer.length > 0) {                    
+                    output += buffer + ','
+                }
+                output += inputs[i]
             }
             else {
-                correct = removeAccents(input) == removeAccents(term.greek)
+                if (buffer.length > 0) {
+                    buffer += ','
+                }                
+                buffer += '?'
             }
-        }
-        else {
-            const correctWords = words[position].english.toLowerCase().replaceAll(';', ',').replaceAll(',', ' ').trim().split(/\s+/)
-            const inputWords = input.toLowerCase().replaceAll(';', ',').replaceAll(',', ' ').trim().split(/\s+/)
-            correct = caseInput == term.takesCase
-            for (const cw of correctWords) {
-                if (!inputWords.includes(cw)) {
-                    correct = false
-                    break
+        } 
+        return output       
+    } 
+
+    const check = () => {
+        setAttempts(attempts + 1)
+
+        let correct = caseInput == term.takesCase
+        if (correct) {
+            if (showEnglish) {
+                let actual = input
+                let expected = term.greek
+
+                if (!checkAccents) {
+                    actual = removeAccents(actual)
+                    expected = removeAccents(expected)
+                }
+
+                if (term.type == 'verb') {
+                    expected = formatVerb(expected)
+                }                
+                correct = actual == expected
+                                
+            }
+            else {
+                const correctWords = words[position].english.toLowerCase().replaceAll(';', ',').replaceAll(',', ' ').trim().split(/\s+/)
+                const inputWords = input.toLowerCase().replaceAll(';', ',').replaceAll(',', ' ').trim().split(/\s+/)                
+                for (const cw of correctWords) {
+                    if (!inputWords.includes(cw)) {
+                        correct = false
+                        break
+                    }
                 }
             }
         }
@@ -152,7 +187,7 @@ function VocabQuiz() {
 
     const displayAttempt = () => {
         if (showEnglish) {
-            return <Latex >{`$${input}$`}</Latex>
+            return <span style={{fontFamily: 'tahoma', fontSize: '20px'}}>{input}</span>
         }
         else {
             return <span>{input}</span>
@@ -161,7 +196,7 @@ function VocabQuiz() {
 
     const displayAnswer = () => {
         if (showEnglish) {
-            return <Latex >{`$${term.greek}$`}</Latex>
+            return <span style={{fontSize: '20px', fontFamily: 'tahoma'}}>{term.type == 'verb' ? formatVerb(term.greek) : term.greek}</span>
         }
         else {
             return (<span>{term.english}</span>)
@@ -211,6 +246,18 @@ function VocabQuiz() {
                                     ))}
                                 </RadioGroup>
                             </FormControl>
+                            <FormLabel>Principal Parts</FormLabel>
+                            <RadioGroup row>
+                                {["First", "Second", "Third", "Fourth", "Fifth", "Sixth"].map((p, i) => (
+                                    <FormControlLabel
+                                        control={<Checkbox />}
+                                        key={`pp_${p}`}
+                                        label={p}
+                                        checked={pps[i]}
+                                        disabled={!showEnglish || !pos.includes('verb')}
+                                        onChange={e => setPPs(pps.map((v, idx) => i == idx ? e.target.checked : v))} />
+                                ))}
+                            </RadioGroup>
                             <FormControl>
                                 <FormLabel>Accents</FormLabel>
                                 <FormControlLabel

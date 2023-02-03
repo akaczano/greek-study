@@ -22,6 +22,7 @@ import NounQuiz from './components/NounQuiz';
 import Verbs from './components/Verbs'
 import VerbDisplay from './components/VerbDisplay'
 import Keyboard from './components/Keyboard'
+import Charts from './components/Charts'
 
 import {
   LANDING,
@@ -35,10 +36,14 @@ import {
   VERBS,
   VERB_DISPLAY,
   VERB_QUIZ,
-  KEYBOARD
+  KEYBOARD,
+  CHARTS,
+  CHART_VIEW,
+  CHART_PRACTICE
 } from './state/navSlice'
 
 import { setContent } from './state/contentSlice'
+import ChartView from './components/ChartView';
 
 function App() {
   const dispatch = useDispatch()
@@ -197,6 +202,15 @@ function App() {
     }
     else if (location === KEYBOARD) {
       return <Keyboard />
+    }
+    else if (location === CHARTS) {
+      return <Charts />
+    }
+    else if (location === CHART_VIEW) {
+      return <ChartView study={false} />
+    }
+    else if (location === CHART_PRACTICE) {
+      return <ChartView study={true} />
     }
   }
   return (

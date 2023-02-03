@@ -13,9 +13,9 @@ import MenuItem from '@mui/material/MenuItem';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { useDispatch } from 'react-redux'
 
-import { go, LANDING, CHAPTER_LIST, NOUNS, VERBS, KEYBOARD } from '../state/navSlice'
+import { go, LANDING, CHAPTER_LIST, NOUNS, VERBS, KEYBOARD, CHARTS } from '../state/navSlice'
 
-const pages = ['Vocabulary', 'Nouns', 'Verbs'];
+const pages = ['Vocabulary', 'Nouns', 'Verbs', 'Charts'];
 const settings = ['Keyboard', 'Vocab and Charts'];
 
 function NavBar() {
@@ -49,6 +49,9 @@ function NavBar() {
     }
     else if (i == 2) {
       dispatch(go([VERBS, {}]))
+    }
+    else if (i == 3) {
+      dispatch(go([CHARTS, {}]))
     }
     handleCloseNavMenu()
   }

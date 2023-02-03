@@ -60,7 +60,7 @@ export const updateText = e => {
 
     const selection = e.target.value.substring(e.target.selectionStart - 1, e.target.selectionEnd)
     const charEntered = selection.charAt(selection.length - 1)
-    console.log(charEntered, map[charEntered])
+    
     if (specialKeys.includes(charEntered) && e.target.selectionStart > 1) {
         const v = e.target.value.charAt(e.target.selectionStart - 2)
         return e.target.value.substring(0, e.target.selectionStart - 2) + updateVowel(v, charEntered) + e.target.value.substring(e.target.selectionStart, e.target.length)

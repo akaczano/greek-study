@@ -12,6 +12,9 @@ export const VERBS = 8;
 export const VERB_DISPLAY = 9;
 export const VERB_QUIZ = 10;
 export const KEYBOARD = 11;
+export const CHARTS = 12;
+export const CHART_VIEW = 13;
+export const CHART_PRACTICE = 14;
 
 const initialState = {
   location: LANDING,
