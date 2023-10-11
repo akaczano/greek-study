@@ -1,0 +1,7 @@
+{
+    "connection": {
+            "dialect": "sqlite",
+	    "storage": "db.sqlite",
+            "quoteIdentifiers": false           
+    }
+}
