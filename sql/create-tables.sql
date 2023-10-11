@@ -1,4 +1,4 @@
-PRAGMA foreign_keys = ON;
+--PRAGMA foreign_keys = ON;
 
 CREATE TABLE IF NOT EXISTS groups (
   id INTEGER PRIMARY KEY AUTOINCREMENT,

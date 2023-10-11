@@ -1,8 +1,12 @@
+import 'bootstrap/dist/css/bootstrap.min.css';
+
+import GroupList from "./components/GroupList";
 
 function App() {
   return (
     <div>
-      <h3>Greek Study Tool</h3>
+      <h1>Greek Study Tool</h1>
+      <GroupList />
     </div>
   );
 }

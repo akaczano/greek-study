@@ -1,7 +1,7 @@
 {
     "connection": {
-            "dialect": "sqlite",
-	    "storage": "db.sqlite",
-            "quoteIdentifiers": false           
+        "dialect": "sqlite",
+	    "storage": "test-db.db",
+        "quoteIdentifiers": false           
     }
 }

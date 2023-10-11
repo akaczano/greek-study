@@ -1,3 +1,3 @@
+DROP TABLE IF EXISTS group_detail;
 DROP TABLE IF EXISTS groups;
 DROP TABLE IF EXISTS terms;
-DROP TABLE IF EXISTS group_detail;
