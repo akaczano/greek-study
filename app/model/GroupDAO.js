@@ -12,7 +12,7 @@ class GroupDAO {
         await runDML(this.db, `
             create table if not exists groups (
                 id integer primary key autoincrement,
-                description text
+                description text unique
             );
         `)
     }

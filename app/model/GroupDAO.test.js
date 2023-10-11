@@ -1,5 +1,4 @@
 const sqlite3 = require('sqlite3').verbose()
-const fs = require('fs')
 const GroupDAO = require('./GroupDAO')
 
 const testFile = 'test.db'
@@ -39,6 +38,9 @@ test('test insert group', async () => {
     expect(listResult).toBe(true)
     expect(list.length).toBe(4)
     expect(list.map(e => e.description).filter(e => e === 'test group 4').length).toBe(1)
+
+    const [result2] = await dao.op('add', ['test group 4'])
+    expect(result2).toBe(false)
 })
 
 test('test update group', async () => {

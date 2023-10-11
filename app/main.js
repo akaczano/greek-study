@@ -6,6 +6,7 @@ const sqlite3 = require('sqlite3').verbose()
 
 
 const GroupDAO = require('./model/GroupDAO')
+const TermDAO = require('./model/TermDAO')
 
 let dao = {}
 
@@ -40,6 +41,9 @@ const init = async () => {
         const initQuery = fs.readFileSync('sql/create-tables.sql').toString()
         db.run(initQuery)
         dao["group"] = new GroupDAO(db)
+        await dao["group"].init()
+        dao["term"] = new TermDAO(db)
+        await dao["term"].init()
         
     }
     catch (err) {

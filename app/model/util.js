@@ -1,6 +1,6 @@
-const runSelect = async (db, query) => {
+const runSelect = async (db, query, params=[]) => {
     const queryPromise = new Promise((resolve, reject) => {
-        db.all(query, (err, rows) => {
+        db.prepare(query, err => { if (err) reject(err) }).bind(params).all((err, rows) => {
             if (err) {
                 reject(err)
             }
@@ -15,8 +15,7 @@ const runSelect = async (db, query) => {
 
 const runInsert = async (db, query, params) => {
     const promise = new Promise((resolve, reject) => {
-        const stmt = db.prepare(query).bind(params).run(err => {
-            console.log(stmt)
+        const stmt = db.prepare(query, err => { if (err) reject(err) }).bind(params).run(err => {
             if (err) reject(err)
             else resolve(stmt.lastID)
         })
@@ -26,8 +25,7 @@ const runInsert = async (db, query, params) => {
 
 const runUpdate = async (db, query, params) => {
     const promise = new Promise((resolve, reject) => {
-        const stmt = db.prepare(query).bind(params).run(err => {
-            console.log(stmt)
+        const stmt = db.prepare(query, err => { if (err) reject(err) }).bind(params).run(err => {
             if (err) reject(err)
             else resolve(stmt.changes)
         })
@@ -39,7 +37,9 @@ const runUpdate = async (db, query, params) => {
 const runDML = (db, query) => {
     const queryPromise = new Promise((resolve, reject) => {
         db.run(query, err => {
-            if (err) reject(err)
+            if (err) { 
+                reject(err)
+            }
             else resolve()
         })
     })
