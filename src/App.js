@@ -1,13 +1,15 @@
-import 'bootstrap/dist/css/bootstrap.min.css';
+import './App.css'
 
 import GroupList from "./components/GroupList";
+import NavBar from "./components/NavBar";
+import Router from "./components/Router";
 
 function App() {
   return (
-    <div>
-      <h1>Greek Study Tool</h1>
-      <GroupList />
-    </div>
+    <>
+      <NavBar />
+      <Router />
+    </>
   );
 }
 

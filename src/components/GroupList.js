@@ -1,8 +1,9 @@
 
 import { useEffect, useState } from 'react'
-import { ButtonGroup, ListGroup, Spinner, Stack, Button, Form, Modal } from 'react-bootstrap'
+import { ListGroup, Spinner, Stack, Button, Form, Modal, Row, Col } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
 import { loadGroups, setUpdate, addGroup, updateGroup, removeGroup } from '../state/groupSlice'
+import { setFilter } from '../state/termSlice'
 
 function GroupList() {
 
@@ -11,6 +12,8 @@ function GroupList() {
         list, loading, error, update, posting, deleting
     } = useSelector(s => s.group)
 
+    const { filter } = useSelector(s => s.term)
+
 
     useEffect(() => {
         dispatch(loadGroups())
@@ -18,7 +21,7 @@ function GroupList() {
 
 
     const [newDesc, setNewDesc] = useState(null)
-    
+
     const addModal = () => {
         return (
             <Modal onHide={() => setNewDesc(null)} show={newDesc !== null}>
@@ -40,43 +43,54 @@ function GroupList() {
     }
 
     const renderGroup = g => {
+        const selectGroup = id => {
+            if (id === filter.group) {
+                dispatch(setFilter({...filter, group: -1}))
+            }
+            else {
+                dispatch(setFilter({...filter, group: id}))
+            }
+        }
+
+        const cn = g.id === filter.group ? 'group-label selected' : 'group-label'
+
         const display = g.id === update.id ?
             (
                 <Stack direction="horizontal" gap={2}>
                     <Form.Control
                         type="text"
-                        style={{ maxWidth: '80%' }}
                         value={update.description || ''}
                         onChange={e => dispatch(setUpdate({ ...update, description: e.target.value }))} />
-                    <Button onClick={() => dispatch(updateGroup())} disabled={posting}>Save</Button>
-                    <Button onClick={() => dispatch(setUpdate({ id: -1, description: '' }))} disabled={posting}>Cancel</Button>
+                    <Button size="sm" onClick={() => dispatch(updateGroup())} disabled={posting}>Save</Button>
+                    <Button size="sm" onClick={() => dispatch(setUpdate({ id: -1, description: '' }))} disabled={posting}>Cancel</Button>
                 </Stack>
 
             ) :
             (
-                <span onDoubleClick={() => dispatch(setUpdate(g))}>
+                <span onDoubleClick={() => dispatch(setUpdate(g))} className={cn} onClick={() => selectGroup(g.id)}>
                     {g.description}
                 </span>
             )
 
         return (
             <ListGroup.Item key={`group_${g.id}`}>
-                <Stack direction="horizontal" style={{ width: '100%' }}>
-                    <div style={{ width: '50%' }}>
+
+                <Row>
+                    <Col md={9}>
                         {display}
-                    </div>
-                    <div style={{ marginLeft: '60%' }}>
-                        <ButtonGroup >
-                            <Button
-                                variant="secondary"
-                                onClick={() => dispatch(removeGroup(g.id))}
-                                disabled={deleting.includes(g.id)}
-                            >
-                                Remove
-                            </Button>
-                        </ButtonGroup>
-                    </div>
-                </Stack>
+                    </Col>
+                    <Col md={3}>
+                        <Button
+                            variant="secondary"
+                            size="sm"
+                            onClick={() => dispatch(removeGroup(g.id))}
+                            disabled={deleting.includes(g.id)}
+                            style={{ float: 'right' }}
+                        >
+                            Remove
+                        </Button>
+                    </Col>
+                </Row>
             </ListGroup.Item>
         )
     }
@@ -109,8 +123,7 @@ function GroupList() {
     return (
         <>
             {addModal()}
-            <Stack gap={2}>
-                <h3>Groups</h3>
+            <Stack gap={2}>                
                 {renderList()}
                 <Button variant="primary" onClick={() => setNewDesc('')}>Add group</Button>
             </Stack>

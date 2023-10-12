@@ -1,9 +1,9 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 
 export const loadTerms = createAsyncThunk(
-    'term:list', async (_, thunkAPI) => {
-        const { filter, offset, limit } = thunkAPI.getState.term
-        const [status, result] = await window.model.query('term:list', [offset, limit, filter])
+    'term:list', async (_, thunkAPI) => {        
+        const { filter, offset, limit } = thunkAPI.getState().term
+        const [status, result] = await window.model.query('term:list', [offset, limit, filter])        
         if (!status) return thunkAPI.rejectWithValue(result)
         return result
     }
@@ -20,7 +20,7 @@ export const addTerm = createAsyncThunk(
 
 export const updateTerm = createAsyncThunk(
     'term:update', async (_, thunkAPI) => {
-        const { newTerm } = thunkAPI.getState().term
+        const { newTerm } = thunkAPI.getState().term        
         const [status, result] = await window.model.query('term:update', [newTerm])
         if (!status) return thunkAPI.rejectWithValue(result)
         return result
@@ -29,13 +29,13 @@ export const updateTerm = createAsyncThunk(
 
 export const removeTerm = createAsyncThunk(
     'term:remove', async (id, thunkAPI) => {
-        const [status] = await window.model.query('term:remove', id)
+        const [status, result] = await window.model.query('term:remove', id)
         if (!status) return thunkAPI.rejectWithValue(result)
         return result
     }
 )
 
-const defaultTerm = {
+export const defaultTerm = {
     term: '',
     definition: '',
     case: 0,
@@ -52,7 +52,7 @@ const initialState = {
     posting: false,
     deleting: [],
     error: null,
-    newTerm: defaultTerm,
+    newTerm: null,
     filter: {
         termFilter: '',
         definitionFilter: '',
@@ -105,8 +105,8 @@ const termSlice = createSlice({
         })
         builder.addCase(updateTerm.fulfilled, (state) => {
             state.posting = false
-            state.list = [...state.list.filter(e => e.id !== state.update.id), state.update]
-            state.newTerm = defaultTerm
+            state.list = [...state.list.filter(e => e.id !== state.newTerm.id), state.newTerm]    
+            state.newTerm = null        
         })
         builder.addCase(updateTerm.rejected, (state, { payload }) => {
             state.posting = false

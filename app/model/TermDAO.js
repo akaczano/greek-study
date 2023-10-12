@@ -45,8 +45,7 @@ class TermDAO {
         }
     }
 
-    async listTerms(offset, limit, filter) {
-        
+    async listTerms(offset, limit, filter) {        
         const { termFilter, definitionFilter, group, pos } = filter
         
         const tf = termFilter ? `%${termFilter}%` : '%'
@@ -69,6 +68,7 @@ class TermDAO {
                 limit ${offset}, ${limit}
                 
             `, [tf, df])
+            
             return [true, results
                 .map(t => ({...t, groups: t.groups ? t.groups.split(',').map(x => parseInt(x)) : []}))
                 .map(t => ({...t, pps: JSON.parse(t.pps)}))
@@ -86,7 +86,7 @@ class TermDAO {
             const id = await runInsert(this.db, `
                 insert into terms (term, definition, "case", notes, pps, pos)
                 values (?, ?, ?, ?, ?, ?)
-            `, [term, definition, t["case"], notes, pps, pos])
+            `, [term, definition, t["case"], notes, JSON.stringify(pps), pos])
 
             for (const g of groups) {
                 await runInsert(this.db, `
@@ -113,7 +113,7 @@ class TermDAO {
                 pps = ?,
                 pos = ?
             where id = ? 
-        `, [term, definition, t["case"], notes, pps, pos, id])
+        `, [term, definition, t["case"], notes, JSON.stringify(pps), pos, id])
         await runUpdate(this.db, `delete from group_detail where term_id = ${id} and group_id not in (${groups.join(',')})`)
         for (const g of groups) {
             await runInsert(this.db, `

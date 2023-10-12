@@ -1,0 +1,16 @@
+.group-label {
+    cursor: pointer;
+}
+
+.group-label:hover {
+    color: #5a88d1;
+}
+
+.group-label.selected {
+    color: blue;
+}
+
+
+.term-modal > .row {
+    margin-bottom: 20px;
+}
