@@ -29,7 +29,7 @@ export const updateTerm = createAsyncThunk(
 
 export const removeTerm = createAsyncThunk(
     'term:remove', async (id, thunkAPI) => {
-        const [status, result] = await window.model.query('term:remove', id)
+        const [status, result] = await window.model.query('term:remove', [id])
         if (!status) return thunkAPI.rejectWithValue(result)
         return result
     }
@@ -102,7 +102,7 @@ const termSlice = createSlice({
         })
         builder.addCase(addTerm.fulfilled, (state, action) => {
             state.posting = false
-            state.list.push({ id: action.payload, description: action.meta.arg })
+            state.list.push(action.meta.arg)
         })
         builder.addCase(addTerm.rejected, (state, { payload }) => {
             state.posting = false

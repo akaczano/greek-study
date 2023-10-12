@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { Spinner, Stack, Table, Form, Button, Row, Col } from 'react-bootstrap'
-import { IoIosArrowBack, IoIosArrowForward } from 'react-icons/io' 
+import { IoIosArrowBack, IoIosArrowForward } from 'react-icons/io'
+import { BsFillTrashFill } from 'react-icons/bs'
 
 import { POS, cases } from '../util/util'
-import { defaultTerm, loadTerms, setFilter, setLimit, setOffset, setNewTerm } from '../state/termSlice'
+import { defaultTerm, loadTerms, setFilter, setLimit, setOffset, setNewTerm, removeTerm } from '../state/termSlice'
 import TermModal from './TermModal'
 import { updateText } from '../util/input'
 
@@ -36,11 +37,16 @@ function TermList() {
 
     const renderRow = t => {
         return (
-            <tr key={`term_${t.id}`} onClick={() => dispatch(setNewTerm(t))}>
-                <td>{t.term}</td>
+            <tr key={`term_${t.id}`}>
+                <td onClick={() => dispatch(setNewTerm(t))}>{t.term}</td>
                 <td>{t.definition}</td>
                 <td>{cases[t.case]}</td>
                 <td>{POS[t.pos]}</td>
+                <td>
+                    <Button size="sm" variant="danger" disabled={deleting.includes(t.id)} onClick={() => dispatch(removeTerm(t.id))}>
+                        <BsFillTrashFill />
+                    </Button>
+                </td>
             </tr>
         )
     }
@@ -50,7 +56,7 @@ function TermList() {
 
         const updateSearchTerm = e => {
             if (searchMode === 0 && e.nativeEvent.data) {
-                updateText(e, str => dispatch(setFilter({ ...filter, termFilter: str, definitionFilter: '' })))                
+                updateText(e, str => dispatch(setFilter({ ...filter, termFilter: str, definitionFilter: '' })))
             }
             else if (searchMode === 0) {
                 dispatch(setFilter({ ...filter, termFilter: e.target.value, definitionFilter: '' }))
@@ -89,7 +95,7 @@ function TermList() {
                     <Button onClick={() => dispatch(setNewTerm(defaultTerm))}>Add term</Button>
                 </Col>
                 <Col md={1}>
-                    { loading ? <Spinner animation="border" variant="info" /> : null }
+                    {loading ? <Spinner animation="border" variant="info" /> : null}
                 </Col>
 
             </Row>
@@ -101,18 +107,17 @@ function TermList() {
         const pn = offset / limit + 1
         const setPageNumber = pn => {
 
-            const offset = (parseInt(pn) - 1 ) * limit
+            const offset = (parseInt(pn) - 1) * limit
             dispatch(setOffset(offset))
         }
-        console.log(offset, limit)
-        console.log(limit + limit * offset)
+
         return (
             <Stack gap={2} direction="horizontal">
                 <Button variant="secondary" disabled={offset === 0} size="sm" onClick={() => setPageNumber(pn - 1)}>
                     <IoIosArrowBack />
-                </Button>                
-                <Form.Control type="number" style={{ maxWidth: '50px' }} value={pn} size="sm" onChange={e => setPageNumber(e.target.value)}/>
-                <Button variant="secondary" size="sm" onClick={() => setPageNumber(pn + 1)} disabled={limit + limit * offset >= count}>
+                </Button>
+                <Form.Control type="number" style={{ maxWidth: '50px' }} value={pn} size="sm" onChange={e => setPageNumber(e.target.value)} />
+                <Button variant="secondary" size="sm" onClick={() => setPageNumber(pn + 1)} disabled={limit + offset >= count}>
                     <IoIosArrowForward />
                 </Button>
                 <Form.Control type="number" style={{ maxWidth: '75px', marginLeft: '25px' }} value={limit} size="sm" onChange={e => dispatch(setLimit(parseInt(e.target.value)))} />
@@ -140,6 +145,7 @@ function TermList() {
             )
         }
         else {
+
             return (
                 <Table striped bordered hover>
                     <thead>
@@ -148,7 +154,6 @@ function TermList() {
                             <th>Definition</th>
                             <th>Special Case</th>
                             <th>Type</th>
-                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>

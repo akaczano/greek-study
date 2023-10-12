@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Modal, Button, Form, Row, Col } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
 import { addTerm, setNewTerm, updateTerm } from '../state/termSlice'
@@ -12,7 +13,7 @@ function TermModal() {
     const { newTerm, posting } = useSelector(s => s.term)
     const groupList = useSelector(s => s.group.list)
 
-
+    const [notesMode, setNotesMode] = useState(0)
 
     if (!newTerm) return null
 
@@ -30,7 +31,7 @@ function TermModal() {
     const handler = newTerm.id ? () => dispatch(updateTerm()) : () => dispatch(addTerm())
 
     const updateGroups = l => {
-        dispatch(setNewTerm({ ...newTerm, groups: l.map(g => g.id)}))
+        dispatch(setNewTerm({ ...newTerm, groups: l.map(g => g.id) }))
     }
 
     return (
@@ -76,7 +77,7 @@ function TermModal() {
                         <Col>
                             <Form.Group>
                                 <Form.Label>Groups</Form.Label>
-                                <Multiselect                                    
+                                <Multiselect
                                     isObject={true}
                                     displayValue="description"
                                     options={groupList}
@@ -97,7 +98,7 @@ function TermModal() {
                                 <Form.Control
                                     type="text"
                                     value={pp}
-                                    onChange={e => greekIn(e, str => dispatch(setNewTerm({ ...newTerm, pps: [...newTerm.pps.slice(0, i), str, ...newTerm.pps.slice(i + 1)]})))} />
+                                    onChange={e => greekIn(e, str => dispatch(setNewTerm({ ...newTerm, pps: [...newTerm.pps.slice(0, i), str, ...newTerm.pps.slice(i + 1)] })))} />
                             </Col>
                         ))}
                     </Row>
@@ -105,7 +106,27 @@ function TermModal() {
                         <Col>
                             <Form.Group>
                                 <Form.Label>Notes</Form.Label>
-                                <Form.Control as="textarea" rows={8} value={newTerm.notes} onChange={e => dispatch(setNewTerm({ ...newTerm, notes: e.target.value }))} />
+                                <Form.Control
+                                    as="textarea"
+                                    rows={8}
+                                    value={newTerm.notes}
+                                    onChange={e => {
+                                        if (notesMode === 1 && e.nativeEvent.data) {
+                                            updateText(e, str => dispatch(setNewTerm({ ...newTerm, notes: str})))
+                                        }
+                                        else {
+                                            dispatch(setNewTerm({ ...newTerm, notes: e.target.value }))
+                                        }
+                                    }}
+                                    onKeyDown={e => {
+                                        if (e.ctrlKey && e.key === 'g') {
+                                            setNotesMode(notesMode === 0 ? 1 : 0)
+                                        }
+                                    }}
+                                    />
+                                <span style={{ fontSize: '13px', color: 'gray' }}>
+                                    typing in {notesMode === 0 ? 'English' : 'Greek'}
+                                </span>
                             </Form.Group>
                         </Col>
                     </Row>

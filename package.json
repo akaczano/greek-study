@@ -1,7 +1,10 @@
 {
-  "name": "greek",
+  "name": "greek-study-tool",
   "version": "0.1.0",
   "private": true,
+  "author": "Aidan Kaczanowski",
+  "description": "Simple tools to aid in the study of ancient Greek",
+  "homepage": "./",
   "main": "app/main.js",
   "dependencies": {
     "@reduxjs/toolkit": "^1.9.7",
@@ -9,7 +12,6 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "bootstrap": "^5.3.2",
-    "electron": "^27.0.0",
     "multiselect-react-dropdown": "^2.0.25",
     "react": "^18.2.0",
     "react-bootstrap": "^2.9.0",
@@ -27,7 +29,10 @@
     "build": "react-scripts build",
     "test": "jest",
     "eject": "react-scripts eject",
-    "electron-dev": "export ELECTRON_START_URL=http://localhost:3000 && export CONFIG=test-config.json && electron ."
+    "electron-dev": "export ELECTRON_START_URL=http://localhost:3000 && export CONFIG=test-config.json && electron .",
+    "electron-package-mac": "npm run build && electron-builder -m -c.extraMetadata.main=build/app/main.js",
+    "electron-pack": "build --em.main=build/app/main.js",
+    "package": "cp -r app build && electron-builder build -c.extraMetadata.main=build/app/main.js --publish never"
   },
   "eslintConfig": {
     "extends": [
@@ -37,17 +42,26 @@
   },
   "browserslist": {
     "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
+      "last 1 electron version"
     ],
     "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
+      "last 1 electron version"
     ]
   },
   "devDependencies": {
+    "electron": "^27.0.0",
+    "electron-builder": "^24.6.4",
     "jest": "^27.5.1"
+  },
+  "build": {
+    "appId": "io.akaczano.greek",
+    "productName": "Greek Study Tool",
+    "files": [
+      "build/**/*",
+      "node_modules/**/*"
+    ],
+    "directories": {
+      "buildResources": "assets"
+    }
   }
 }
