@@ -2,15 +2,18 @@ import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { Spinner, Stack, Table, Form, Button, Row, Col } from 'react-bootstrap'
+import { IoIosArrowBack, IoIosArrowForward } from 'react-icons/io' 
 
 import { POS, cases } from '../util/util'
-import { defaultTerm, loadTerms, setFilter, setNewTerm } from '../state/termSlice'
+import { defaultTerm, loadTerms, setFilter, setLimit, setOffset, setNewTerm } from '../state/termSlice'
 import TermModal from './TermModal'
+import { updateText } from '../util/input'
 
 function TermList() {
 
     const {
         list,
+        count,
         loading,
         posting,
         error,
@@ -46,7 +49,10 @@ function TermList() {
     const getControls = () => {
 
         const updateSearchTerm = e => {
-            if (searchMode === 0) {
+            if (searchMode === 0 && e.nativeEvent.data) {
+                updateText(e, str => dispatch(setFilter({ ...filter, termFilter: str, definitionFilter: '' })))                
+            }
+            else if (searchMode === 0) {
                 dispatch(setFilter({ ...filter, termFilter: e.target.value, definitionFilter: '' }))
             }
             else {
@@ -56,7 +62,7 @@ function TermList() {
 
         return (
             <Row>
-                <Col md={6}>
+                <Col md={5}>
                     <Form.Control
                         type="text"
                         placeholder="search"
@@ -69,8 +75,8 @@ function TermList() {
                         <option value={1}>Definition</option>
                     </Form.Select>
                 </Col>
-                <Col md={3}>
-                    <Form.Select>
+                <Col md={2}>
+                    <Form.Select value={filter.pos} onChange={e => dispatch(setFilter({ ...filter, pos: e.target.value }))}>
                         <option value={-1}>All</option>
                         {POS.map((name, i) => {
                             return (
@@ -82,6 +88,9 @@ function TermList() {
                 <Col>
                     <Button onClick={() => dispatch(setNewTerm(defaultTerm))}>Add term</Button>
                 </Col>
+                <Col md={1}>
+                    { loading ? <Spinner animation="border" variant="info" /> : null }
+                </Col>
 
             </Row>
         )
@@ -89,18 +98,33 @@ function TermList() {
 
     const getPagination = () => {
 
+        const pn = offset / limit + 1
+        const setPageNumber = pn => {
+
+            const offset = (parseInt(pn) - 1 ) * limit
+            dispatch(setOffset(offset))
+        }
+        console.log(offset, limit)
+        console.log(limit + limit * offset)
+        return (
+            <Stack gap={2} direction="horizontal">
+                <Button variant="secondary" disabled={offset === 0} size="sm" onClick={() => setPageNumber(pn - 1)}>
+                    <IoIosArrowBack />
+                </Button>                
+                <Form.Control type="number" style={{ maxWidth: '50px' }} value={pn} size="sm" onChange={e => setPageNumber(e.target.value)}/>
+                <Button variant="secondary" size="sm" onClick={() => setPageNumber(pn + 1)} disabled={limit + limit * offset >= count}>
+                    <IoIosArrowForward />
+                </Button>
+                <Form.Control type="number" style={{ maxWidth: '75px', marginLeft: '25px' }} value={limit} size="sm" onChange={e => dispatch(setLimit(parseInt(e.target.value)))} />
+                <span>per page</span>
+                <span style={{ marginLeft: '20px' }}>({count} total terms)</span>
+            </Stack>
+        )
+
     }
 
     const getDisplay = () => {
-        if (loading) {
-            return (
-                <Stack direction="horizontal">
-                    <p>Loading terms</p>
-                    <Spinner animation="border" />
-                </Stack>
-            )
-        }
-        else if (error) {
+        if (error) {
             return (
                 <Stack direction="vertical">
                     <h3>There was a problem loading terms</h3>
@@ -111,7 +135,7 @@ function TermList() {
         else if (list.length < 1) {
             return (
                 <p>
-                    You don't have any terms yet
+                    No terms found.
                 </p>
             )
         }
@@ -141,6 +165,7 @@ function TermList() {
             <Stack gap={3}>
                 {getControls()}
                 {getDisplay()}
+                {getPagination()}
             </Stack>
         </>
 

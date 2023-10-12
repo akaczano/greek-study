@@ -1,4 +1,4 @@
-const runSelect = async (db, query, params=[]) => {
+const runSelect = (db, query, params=[]) => {
     const queryPromise = new Promise((resolve, reject) => {
         db.prepare(query, err => { if (err) reject(err) }).bind(params).all((err, rows) => {
             if (err) {
@@ -9,11 +9,11 @@ const runSelect = async (db, query, params=[]) => {
             }
         })
     })
-    return await queryPromise
+    return queryPromise
 } 
 
 
-const runInsert = async (db, query, params) => {
+const runInsert = (db, query, params) => {
     const promise = new Promise((resolve, reject) => {
         const stmt = db.prepare(query, err => { if (err) reject(err) }).bind(params).run(err => {
             if (err) reject(err)
@@ -23,7 +23,7 @@ const runInsert = async (db, query, params) => {
     return promise    
 }
 
-const runUpdate = async (db, query, params) => {
+const runUpdate = (db, query, params) => {
     const promise = new Promise((resolve, reject) => {
         const stmt = db.prepare(query, err => { if (err) reject(err) }).bind(params).run(err => {
             if (err) reject(err)
@@ -46,5 +46,15 @@ const runDML = (db, query) => {
     return queryPromise
 }
 
+const runGet = (db, query, params=[]) => {
+    const queryPromise = new Promise((resolve, reject) => {
+        db.get(query, params, (err, row) => {
+            if (err) reject(err)
+            else resolve(row)
+        })
+    })
+    return queryPromise
+}
 
-module.exports = { runSelect, runDML, runInsert, runUpdate }
+
+module.exports = { runSelect, runDML, runInsert, runUpdate, runGet }

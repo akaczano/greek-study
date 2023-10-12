@@ -1,4 +1,4 @@
-const { runSelect, runDML, runInsert, runUpdate } = require("./util")
+const { runSelect, runDML, runInsert, runUpdate, runGet } = require("./util")
 
 
 class TermDAO {
@@ -23,7 +23,7 @@ class TermDAO {
                 );
         `)
         await runDML(this.db, `PRAGMA foreign_keys = on;`)
-        
+
         await runDML(this.db, `
             CREATE TABLE IF NOT EXISTS group_detail (
                 group_id INTEGER NOT NULL,
@@ -45,33 +45,44 @@ class TermDAO {
         }
     }
 
-    async listTerms(offset, limit, filter) {        
+    async listTerms(offset, limit, filter) {
         const { termFilter, definitionFilter, group, pos } = filter
-        
+
         const tf = termFilter ? `%${termFilter}%` : '%'
         const df = definitionFilter ? `%${definitionFilter}%` : '%'
-        const pf = `(${pos.join()})`
         const g = group || -1
 
         try {
+
+            const whereClause = `
+                where term like ? and
+                definition like ? and
+                (${pos} = -1 or pos = ${pos})
+            `
+
+            const totalTerms = await runGet(this.db, `
+                select count(distinct(id)) as count from terms
+                left join group_detail on terms.id = group_detail.term_id
+                ${whereClause}
+                and (${g} = -1 or group_id = ${g}) 
+            `, [tf, df])
             const results = await runSelect(this.db, `
                 select terms.id, term, definition, "case", pos, notes, pps, 
                     group_concat(group_id, ',') as groups
-                from terms 
+                from terms                 
                 left join group_detail on terms.id = group_detail.term_id 
-                where term like ? and
-                definition like ? and
-                pos in ${pf}
+                ${whereClause}
                 group by 1, 2, 3, 4, 5, 6, 7
                 having (${g} = -1 or groups like '%${g}%') 
                 order by term asc
                 limit ${offset}, ${limit}
                 
             `, [tf, df])
-            
+
             return [true, results
-                .map(t => ({...t, groups: t.groups ? t.groups.split(',').map(x => parseInt(x)) : []}))
-                .map(t => ({...t, pps: JSON.parse(t.pps)}))
+                .map(t => ({ ...t, groups: t.groups ? t.groups.split(',').map(x => parseInt(x)) : [] }))
+                .map(t => ({ ...t, pps: JSON.parse(t.pps) })),
+                totalTerms.count
             ]
         } catch (err) {
             console.log(err)
@@ -80,7 +91,7 @@ class TermDAO {
     }
 
     async addTerm(t) {
-        
+
         const { term, definition, notes, pps, pos, groups } = t
         try {
             const id = await runInsert(this.db, `

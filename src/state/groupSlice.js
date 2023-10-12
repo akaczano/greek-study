@@ -35,7 +35,8 @@ const initialState = {
         description: ''
     },
     deleting: [],
-    error: null
+    error: null,
+    loadError: null
 }
 
 const groupSlice = createSlice({
@@ -44,6 +45,9 @@ const groupSlice = createSlice({
     reducers: {
         setUpdate: (state, { payload }) => {
             state.update = payload
+        },
+        clearError: state => {
+            state.error = null
         }
     },
     extraReducers: builder => {
@@ -57,7 +61,7 @@ const groupSlice = createSlice({
         })
         builder.addCase(loadGroups.rejected, (state, { payload }) => {
             state.loading = false
-            state.error = payload
+            state.loadError = payload
         })
         builder.addCase(addGroup.pending, (state) => {
             state.posting = true
@@ -99,5 +103,5 @@ const groupSlice = createSlice({
     }
 })
 
-export const { setUpdate } = groupSlice.actions
+export const { setUpdate, clearError } = groupSlice.actions
 export default groupSlice.reducer

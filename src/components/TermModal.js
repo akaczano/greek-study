@@ -76,8 +76,7 @@ function TermModal() {
                         <Col>
                             <Form.Group>
                                 <Form.Label>Groups</Form.Label>
-                                <Multiselect
-                                    className="form-control"
+                                <Multiselect                                    
                                     isObject={true}
                                     displayValue="description"
                                     options={groupList}

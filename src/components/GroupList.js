@@ -1,15 +1,15 @@
 
 import { useEffect, useState } from 'react'
-import { ListGroup, Spinner, Stack, Button, Form, Modal, Row, Col } from 'react-bootstrap'
+import { ListGroup, Spinner, Stack, Button, Form, Modal, Row, Col, Alert } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
-import { loadGroups, setUpdate, addGroup, updateGroup, removeGroup } from '../state/groupSlice'
+import { loadGroups, setUpdate, addGroup, updateGroup, removeGroup, clearError } from '../state/groupSlice'
 import { setFilter } from '../state/termSlice'
 
 function GroupList() {
 
     const dispatch = useDispatch()
     const {
-        list, loading, error, update, posting, deleting
+        list, loading, error, update, posting, deleting, loadError
     } = useSelector(s => s.group)
 
     const { filter } = useSelector(s => s.term)
@@ -104,10 +104,11 @@ function GroupList() {
                 </div>
             )
         }
-        else if (error) {
+        else if (loadError) {
             return (
                 <div>
-                    <p style={{ color: 'red' }}>{error}</p>
+                    <p style={{ color: 'red' }}>{error.message}</p>
+                    <Button variant="link" onClick={() => dispatch(loadGroups())}>Reload</Button>
                 </div>
             )
         }
@@ -120,11 +121,21 @@ function GroupList() {
         }
     }
 
+    const errorMessage = () => {
+        if (!error) return null
+        return (
+            <Alert variant="danger" onClose={() => dispatch(clearError())} dismissible>
+                {error.message}
+            </Alert>
+        )
+    }
+
     return (
         <>
             {addModal()}
             <Stack gap={2}>                
                 {renderList()}
+                {errorMessage()}
                 <Button variant="primary" onClick={() => setNewDesc('')}>Add group</Button>
             </Stack>
         </>

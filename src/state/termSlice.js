@@ -3,9 +3,9 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 export const loadTerms = createAsyncThunk(
     'term:list', async (_, thunkAPI) => {        
         const { filter, offset, limit } = thunkAPI.getState().term
-        const [status, result] = await window.model.query('term:list', [offset, limit, filter])        
+        const [status, result, count] = await window.model.query('term:list', [offset, limit, filter])        
         if (!status) return thunkAPI.rejectWithValue(result)
-        return result
+        return [result, count]
     }
 )
 
@@ -48,6 +48,7 @@ export const defaultTerm = {
 
 const initialState = {
     list: [],
+    count: 0,
     loading: false,
     posting: false,
     deleting: [],
@@ -57,7 +58,7 @@ const initialState = {
         termFilter: '',
         definitionFilter: '',
         group: -1,
-        pos: [0, 1, 2, 3, 4, 5]
+        pos: -1
     },
     offset: 0,
     limit: 50
@@ -72,6 +73,12 @@ const termSlice = createSlice({
         },
         setNewTerm: (state, { payload }) => {
             state.newTerm = payload
+        },
+        setOffset: (state, { payload }) => {
+            state.offset = payload
+        },
+        setLimit: (state, { payload }) => {
+            state.limit = payload
         }
     },
     extraReducers: builder => {
@@ -79,9 +86,11 @@ const termSlice = createSlice({
             state.loading = true
             state.error = null
         })
-        builder.addCase(loadTerms.fulfilled, (state, { payload }) => {
+        builder.addCase(loadTerms.fulfilled, (state, action) => {
+            const [list, count] = action.payload
             state.loading = false
-            state.list = payload
+            state.list = list
+            state.count = count
         })
         builder.addCase(loadTerms.rejected, (state, { payload }) => {
             state.loading = false
@@ -127,5 +136,5 @@ const termSlice = createSlice({
     }
 })
 
-export const { setFilter, setNewTerm } = termSlice.actions
+export const { setFilter, setNewTerm, setLimit, setOffset } = termSlice.actions
 export default termSlice.reducer
