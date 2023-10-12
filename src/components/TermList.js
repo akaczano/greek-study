@@ -25,6 +25,7 @@ function TermList() {
         newTerm
     } = useSelector(state => state.term)
 
+
     const dispatch = useDispatch()
 
     useEffect(() => {
@@ -35,9 +36,10 @@ function TermList() {
 
 
 
-    const renderRow = t => {
+    const renderRow = (t, i) => {
         return (
             <tr key={`term_${t.id}`}>
+                <td>{i + 1}</td>
                 <td onClick={() => dispatch(setNewTerm(t))}>{t.term}</td>
                 <td>{t.definition}</td>
                 <td>{cases[t.case]}</td>
@@ -147,19 +149,22 @@ function TermList() {
         else {
 
             return (
-                <Table striped bordered hover>
-                    <thead>
-                        <tr>
-                            <th>Term</th>
-                            <th>Definition</th>
-                            <th>Special Case</th>
-                            <th>Type</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {list.slice().sort((t1, t2) => t1.term.localeCompare(t2.term)).map(renderRow)}
-                    </tbody>
-                </Table>
+                <div style={{ maxHeight: '75vh', overflowY: 'auto'}}>
+                    <Table bordered hover>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Term</th>
+                                <th>Definition</th>
+                                <th>Special Case</th>
+                                <th>Type</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {list.slice().sort((t1, t2) => t1.term.localeCompare(t2.term)).map(renderRow)}
+                        </tbody>
+                    </Table>
+                </div>
             )
         }
     }

@@ -112,6 +112,13 @@ function GroupList() {
                 </div>
             )
         }
+        else if (list.length < 1) {
+            return (
+                <div style={{ padding: '20px'}}>
+                    <p>You don't have any groups yet.</p>
+                </div>
+            )
+        }
         else {
             return (
                 <ListGroup>

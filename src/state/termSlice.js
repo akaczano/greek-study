@@ -101,8 +101,9 @@ const termSlice = createSlice({
             state.error = null
         })
         builder.addCase(addTerm.fulfilled, (state, action) => {
-            state.posting = false
-            state.list.push(action.meta.arg)
+            state.posting = false            
+            state.list.push({ ...state.newTerm, id: action.payload })
+            state.newTerm = null
         })
         builder.addCase(addTerm.rejected, (state, { payload }) => {
             state.posting = false
