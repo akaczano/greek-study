@@ -23,6 +23,7 @@ function GroupList() {
     const [newDesc, setNewDesc] = useState(null)
 
     const addModal = () => {
+        if (newDesc === null) return null
         return (
             <Modal onHide={() => setNewDesc(null)} show={newDesc !== null}>
                 <Modal.Header closeButton>

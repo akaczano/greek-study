@@ -15,14 +15,12 @@ function TermList() {
     const {
         list,
         count,
-        loading,
-        posting,
+        loading,        
         error,
         filter,
         deleting,
         offset,
-        limit,
-        newTerm
+        limit,        
     } = useSelector(state => state.term)
 
 

@@ -34,7 +34,7 @@ export const GRAVE = 3;
 export const CIRCUMFLEX = 4;
 export const IOTA = 2;
 
-const expandCircumflex = l => [l[0], null, l[1], l[2], null, l[3], l[4]]
+//const expandCircumflex = l => [l[0], null, l[1], l[2], null, l[3], l[4]]
 const expandSubscript = l => [l[0], null, l[1], null, null, null, l[2]]
 
 const lists = [
@@ -95,13 +95,13 @@ export const mapVowel = (v, update) => {
         }        
         let target = ''
         for (const [list, bm, accent, subscript] of lists) {
-            if (bm == state.bm && accent == state.accent && subscript == state.subscript) {                
+            if (bm === state.bm && accent === state.accent && subscript === state.subscript) {                
                 target = list[index]
                 break
             }
         }
         if (target) {
-            if (c != v) target = target.toUpperCase()
+            if (c !== v) target = target.toUpperCase()
             return target
         }
         
@@ -124,13 +124,13 @@ export const removeAccents = text => {
 }
 
 export const compareTypes = (a, b) => {
-    if (a == b) return 0;
-    else if (a == 'verb') return -1;
-    else if (b == 'verb') return 1;
-    else if (a == 'noun') return -1;
-    else if (b == 'noun') return 1;
-    else if (a == 'adjective') return -1;
-    else if (b == 'adjective') return 1;
+    if (a === b) return 0;
+    else if (a === 'verb') return -1;
+    else if (b === 'verb') return 1;
+    else if (a === 'noun') return -1;
+    else if (b === 'noun') return 1;
+    else if (a === 'adjective') return -1;
+    else if (b === 'adjective') return 1;
     return 0;
 }
 
@@ -143,13 +143,13 @@ export const compareGreekf = (a, b) => {
 
 
     while (true) {
-        if (apure.length == 0 && bpure.length > 0) {
+        if (apure.length === 0 && bpure.length > 0) {
             return -1
         }
-        else if (apure.length > 0 && bpure.length == 0) {
+        else if (apure.length > 0 && bpure.length === 0) {
             return 1
         }
-        else if (apure.length == 0 && bpure.length == 0) {
+        else if (apure.length === 0 && bpure.length === 0) {
             return 0
         }
 
@@ -169,7 +169,7 @@ export const compareGreekf = (a, b) => {
         const bindex = alphabet[bletter]
         apure = newa
         bpure = newb
-        if (aindex == bindex) continue
+        if (aindex === bindex) continue
         return aindex - bindex
     }
 }
