@@ -20,15 +20,18 @@ function TermList() {
         filter,
         deleting,
         offset,
-        limit,        
+        limit,       
+        posting 
     } = useSelector(state => state.term)
 
 
     const dispatch = useDispatch()
 
     useEffect(() => {
-        dispatch(loadTerms())
-    }, [dispatch, filter, offset, limit])
+        if (!posting) {
+            dispatch(loadTerms())
+        }
+    }, [dispatch, filter, offset, limit, posting, deleting])
 
     const [searchMode, setSearchMode] = useState(0)
 

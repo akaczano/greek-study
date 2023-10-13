@@ -98,6 +98,7 @@ function TermModal() {
                                 <Form.Control
                                     type="text"
                                     value={pp}
+                                    disabled={newTerm.pos !== 1}
                                     onChange={e => greekIn(e, str => dispatch(setNewTerm({ ...newTerm, pps: [...newTerm.pps.slice(0, i), str, ...newTerm.pps.slice(i + 1)] })))} />
                             </Col>
                         ))}
