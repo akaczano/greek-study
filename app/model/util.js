@@ -25,7 +25,7 @@ const runInsert = (db, query, params) => {
 
 const runUpdate = (db, query, params) => {
     const promise = new Promise((resolve, reject) => {
-        const stmt = db.prepare(query, err => { if (err) reject(err) }).bind(params).run(err => {
+        const stmt = db.prepare(query, err => { if (err) reject(err) }).bind(params).run(err => {            
             if (err) reject(err)
             else resolve(stmt.changes)
         })
@@ -48,7 +48,7 @@ const runDML = (db, query) => {
 
 const runGet = (db, query, params=[]) => {
     const queryPromise = new Promise((resolve, reject) => {
-        db.get(query, params, (err, row) => {
+        db.get(query, params, (err, row) => {            
             if (err) reject(err)
             else resolve(row)
         })
@@ -57,4 +57,21 @@ const runGet = (db, query, params=[]) => {
 }
 
 
-module.exports = { runSelect, runDML, runInsert, runUpdate, runGet }
+const runIteration = (db, query, params=[], f) => {
+    const queryPromise = new Promise((resolve, reject) => {
+        db.each(query, params, f, err => { if (err) { reject(err) } else resolve()})
+    })
+    return queryPromise
+}
+
+const sampleArray = ([...arr], n = 1) => {
+    let m = arr.length;
+    while (m) {
+      const i = Math.floor(Math.random() * m--);
+      [arr[m], arr[i]] = [arr[i], arr[m]];
+    }
+    return arr.slice(0, n);
+  };
+
+
+module.exports = { runSelect, runDML, runInsert, runUpdate, runGet, runIteration, sampleArray }

@@ -7,6 +7,7 @@ const sqlite3 = require('sqlite3').verbose()
 
 const GroupDAO = require('./model/GroupDAO')
 const TermDAO = require('./model/TermDAO')
+const StudyDAO = require('./model/StudyDAO')
 
 let dao = {}
 
@@ -44,6 +45,8 @@ const init = async () => {
         await dao["group"].init()
         dao["term"] = new TermDAO(db)
         await dao["term"].init()
+        dao["study"] = new StudyDAO(db)
+        await dao["study"].init()
         
     }
     catch (err) {

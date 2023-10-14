@@ -27,6 +27,42 @@ const loadAssignments = async (db) => {
     await runDML(db, `INSERT into group_detail (term_id, group_id) values (4, 2);`)
 }
 
+const loadStudyData = async (db) => {
 
-module.exports = { loadGroups, loadTerms, loadAssignments }
+    await runDML(db, `INSERT INTO terms (id, term, definition, "case", pos) values (1, 'term1', '', 0, 0);`)
+    await runDML(db, `INSERT INTO terms (id, term, definition, "case", pos) values (2, 'term2', '', 0, 1);`)
+    await runDML(db, `INSERT INTO terms (id, term, definition, "case", pos) values (3, 'term3', '', 0, 0);`)
+    await runDML(db, `INSERT INTO terms (id, term, definition, "case", pos) values (4, 'term4', '', 0, 1);`)
+    await runDML(db, `INSERT INTO terms (id, term, definition, "case", pos) values (5, 'term5', '', 0, 0);`)
+    await runDML(db, `INSERT INTO terms (id, term, definition, "case", pos) values (6, 'term6', '', 0, 1);`)
+    await runDML(db, `INSERT INTO terms (id, term, definition, "case", pos) values (7, 'term7', '', 0, 0);`)
+    await runDML(db, `INSERT INTO terms (id, term, definition, "case", pos) values (8, 'term8', '', 0, 1);`)
+    await runDML(db, `INSERT INTO terms (id, term, definition, "case", pos) values (9, 'term9', '', 0, 0);`)
+    await runDML(db, `INSERT INTO terms (id, term, definition, "case", pos) values (10, 'term10', '', 0, 1);`)
+
+    await runDML(db, `INSERT INTO groups (id, description) values (1, 'group1');`)
+    await runDML(db, `INSERT INTO groups (id, description) values (2, 'group2');`)
+    
+    await runDML(db, `INSERT into group_detail (term_id, group_id) values (1, 1);`)
+    await runDML(db, `INSERT into group_detail (term_id, group_id) values (2, 1);`)
+    await runDML(db, `INSERT into group_detail (term_id, group_id) values (3, 1);`)
+    await runDML(db, `INSERT into group_detail (term_id, group_id) values (4, 1);`)
+    await runDML(db, `INSERT into group_detail (term_id, group_id) values (5, 1);`)
+    await runDML(db, `INSERT into group_detail (term_id, group_id) values (6, 2);`)
+    await runDML(db, `INSERT into group_detail (term_id, group_id) values (7, 2);`)
+    await runDML(db, `INSERT into group_detail (term_id, group_id) values (8, 2);`)
+    await runDML(db, `INSERT into group_detail (term_id, group_id) values (9, 2);`)
+    await runDML(db, `INSERT into group_detail (term_id, group_id) values (10, 2);`)
+
+
+    await runDML(db, `INSERT INTO term_stats (term_id, last_reviewed, correct_count, total_count) values (1, ${new Date('2023/10/4') * 1}, 9, 10)`)
+    await runDML(db, `INSERT INTO term_stats (term_id, last_reviewed, correct_count, total_count) values (3, ${new Date('2023/10/8') * 1}, 15, 20)`)
+    await runDML(db, `INSERT INTO term_stats (term_id, last_reviewed, correct_count, total_count) values (5, ${new Date('2023/5/10') * 1}, 12, 30)`)
+    await runDML(db, `INSERT INTO term_stats (term_id, last_reviewed, correct_count, total_count) values (7, ${new Date('2023/6/8') * 1}, 7, 40)`)
+    await runDML(db, `INSERT INTO term_stats (term_id, last_reviewed, correct_count, total_count) values (9, ${new Date('2023/9/25') * 1}, 5, 50)`)
+
+}
+
+
+module.exports = { loadGroups, loadTerms, loadAssignments, loadStudyData }
 
