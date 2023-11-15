@@ -1,4 +1,13 @@
+const GroupDAO = require('./GroupDAO')
+const { TermDAO } = require('./TermDAO')
+const StudyDAO = require('./StudyDAO')
 const { runDML } = require('./util')
+
+const resetDatabase = async (db) => {
+    await new GroupDAO(db).init(true)
+    await new TermDAO(db).init(true)
+    await new StudyDAO(db).init(true)
+}
 
 const loadGroups = async (db) => {
     const group1 = `INSERT INTO groups (id, description) values (1, 'Group 1');`
@@ -64,5 +73,5 @@ const loadStudyData = async (db) => {
 }
 
 
-module.exports = { loadGroups, loadTerms, loadAssignments, loadStudyData }
+module.exports = { resetDatabase, loadGroups, loadTerms, loadAssignments, loadStudyData }
 

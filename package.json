@@ -27,7 +27,7 @@
   "scripts": {
     "start": "export BROWSER=NONE && react-scripts start",
     "build": "react-scripts build",
-    "test": "jest",
+    "test": "jest --runInBand",
     "eject": "react-scripts eject",
     "electron-dev": "concurrently \"BROWSER=none npm start\" \"export ELECTRON_START_URL=http://localhost:3000 && export CONFIG=test-config.json && wait-on http://localhost:3000 && electron .\"",
     "electron": "concurrently \"BROWSER=none npm start\" \"export ELECTRON_START_URL=http://localhost:3000 && export CONFIG=config.json && wait-on http://localhost:3000 && electron .\"",

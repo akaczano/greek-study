@@ -6,7 +6,7 @@ const sqlite3 = require('sqlite3').verbose()
 
 
 const GroupDAO = require('./model/GroupDAO')
-const TermDAO = require('./model/TermDAO')
+const { TermDAO } = require('./model/TermDAO')
 const StudyDAO = require('./model/StudyDAO')
 
 let dao = {}

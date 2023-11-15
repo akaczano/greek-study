@@ -1,11 +1,11 @@
 import { useState } from 'react'
 import { Modal, Button, Form, Row, Col } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
-import { addTerm, setNewTerm, updateTerm } from '../state/termSlice'
+import { addTerm, setNewTerm, updateTerm } from '../../state/termSlice'
 import Multiselect from 'multiselect-react-dropdown'
 
-import { POS, cases } from '../util/util'
-import { updateText } from '../util/input'
+import { POS, cases } from '../../util/util'
+import { updateText } from '../../util/input'
 
 function TermModal() {
 

@@ -5,10 +5,10 @@ import { Spinner, Stack, Table, Form, Button, Row, Col } from 'react-bootstrap'
 import { IoIosArrowBack, IoIosArrowForward } from 'react-icons/io'
 import { BsFillTrashFill } from 'react-icons/bs'
 
-import { POS, cases } from '../util/util'
-import { defaultTerm, loadTerms, setFilter, setLimit, setOffset, setNewTerm, removeTerm } from '../state/termSlice'
+import { POS, cases } from '../../util/util'
+import { defaultTerm, loadTerms, setFilter, setLimit, setOffset, setNewTerm, removeTerm } from '../../state/termSlice'
 import TermModal from './TermModal'
-import { updateText } from '../util/input'
+import { updateText } from '../../util/input'
 
 function TermList() {
 

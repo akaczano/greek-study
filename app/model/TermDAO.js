@@ -1,5 +1,12 @@
 const { runSelect, runDML, runInsert, runUpdate, runGet } = require("./util")
 
+const prepareTerm = t => {
+    return {
+        ...t,
+        groups: t.groups ? t.groups.split(',').map(x => parseInt(x)) : [],
+        pps: JSON.parse(t.pps) 
+    }
+}
 
 class TermDAO {
     constructor(db) {
@@ -79,11 +86,7 @@ class TermDAO {
                 
             `, [tf, df])
 
-            return [true, results
-                .map(t => ({ ...t, groups: t.groups ? t.groups.split(',').map(x => parseInt(x)) : [] }))
-                .map(t => ({ ...t, pps: JSON.parse(t.pps) })),
-                totalTerms.count
-            ]
+            return [true, results.map(prepareTerm), totalTerms.count]
         } catch (err) {
             console.log(err)
             return [false, err]
@@ -148,4 +151,4 @@ class TermDAO {
 
 }
 
-module.exports = TermDAO
+module.exports = { TermDAO, prepareTerm }

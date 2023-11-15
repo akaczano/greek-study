@@ -2,7 +2,7 @@ const sqlite3 = require('sqlite3').verbose()
 const GroupDAO = require('./GroupDAO')
 
 const testFile = 'test.db'
-const { loadGroups } = require('./test-util')
+const { loadGroups, resetDatabase } = require('./test-util')
 
 let dao = null
 
@@ -11,7 +11,7 @@ beforeEach(async () => {
     const db = new sqlite3.Database(testFile)
     dao = new GroupDAO(db)
     try {
-        await dao.init(true)
+        await resetDatabase(db)        
         await loadGroups(db)
     }
     catch (err) {

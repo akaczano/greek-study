@@ -14,3 +14,18 @@
 .term-modal > .row {
     margin-bottom: 20px;
 }
+
+.center-card {    
+    height: 100px;
+    background-color: red;
+    
+    position: absolute;
+    top:0;
+    bottom: 0;        
+    
+    margin: auto;
+}
+
+.set-form > .row {
+    margin-bottom: 20px;
+}

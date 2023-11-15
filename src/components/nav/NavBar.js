@@ -1,5 +1,5 @@
 import { useDispatch } from 'react-redux'
-import { go, VOCAB, NOTES } from '../state/navSlice'
+import { go, VOCAB, NOTES, PRACTICE } from '../../state/navSlice'
 import { Navbar, Nav, Container } from 'react-bootstrap'
 
 
@@ -17,6 +17,7 @@ function NavBar() {
                     <Nav className="me-auto">
                         <Nav.Link onClick={() => dispatch(go(VOCAB))}>Vocabulary</Nav.Link>
                         <Nav.Link onClick={() => dispatch(go(NOTES))}>Notes</Nav.Link>
+                        <Nav.Link onClick={() => dispatch(go(PRACTICE))}>Practice</Nav.Link>
                     </Nav>
                 </Navbar.Collapse>
             </Container>

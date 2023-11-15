@@ -3,6 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 export const NOTES = 0;
 export const VOCAB = 1;
 export const CHARTS = 2;
+export const PRACTICE = 3
 
 const initialState = {
     location: VOCAB

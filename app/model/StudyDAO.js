@@ -1,3 +1,4 @@
+const { prepareTerm } = require('./TermDAO')
 const { runDML, runInsert, sampleArray, runGet, runIteration, runUpdate, runSelect } = require('./util')
 
 const ORDER_RANDOM = 0
@@ -203,7 +204,7 @@ class StudyDAO {
                 group by attempt                
             `, [set.id])
 
-        console.log(results)
+        
         const unAttempted = results.filter(r => r.attempt === 0).length
         if (unAttempted > 0) return [false, { message: 'Set not complete' }]
 
@@ -219,7 +220,7 @@ class StudyDAO {
 
         const prom = runGet(this.db, `
             select * from practice_sets 
-            order by coalesce(completed_time, 33254194817) desc
+            order by coalesce(completed_time, 33254194817000) desc
             limit 1
         `)
 
@@ -243,7 +244,7 @@ class StudyDAO {
         try {
             const line = await runGet(this.db, `select * from practice_detail where attempt = 0 and set_id = ? limit 1`, [set.id])
             const term = await runGet(this.db, `select * from terms where id = ?`, [line.term_id])
-            return [true, line, term]
+            return [true, line, prepareTerm(term)]
         }
         catch (err) {
             console.log(err)

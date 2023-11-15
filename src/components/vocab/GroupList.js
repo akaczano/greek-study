@@ -2,8 +2,8 @@
 import { useEffect, useState } from 'react'
 import { ListGroup, Spinner, Stack, Button, Form, Modal, Row, Col, Alert } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
-import { loadGroups, setUpdate, addGroup, updateGroup, removeGroup, clearError } from '../state/groupSlice'
-import { setFilter } from '../state/termSlice'
+import { loadGroups, setUpdate, addGroup, updateGroup, removeGroup, clearError } from '../../state/groupSlice'
+import { setFilter } from '../../state/termSlice'
 
 function GroupList() {
 
